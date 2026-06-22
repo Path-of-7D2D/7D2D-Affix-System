@@ -21,6 +21,8 @@ or Rare item.
 - Adds a prototype `Affix Augment` currency item with an inventory use action.
 - Keeps weapon affix pools scoped by item category so melee-only and gun-only
   stats do not roll on the wrong weapon type.
+- Adds bow/crossbow-specific affixes for projectile velocity, bow damage, and
+  crossbow reload speed.
 - Adds the first tool-specific affix pool for block damage, harvest count,
   stamina cost, durability, motor tools, and lower-value entity damage.
 - Adds the first armor-specific affix pool for health, stamina, movement,
@@ -94,6 +96,8 @@ Examples:
 ```text
 affix spawn magic
 affix spawn rare gunHandgunT1Pistol 6
+affix spawn rare gunBowT1WoodenBow 6
+affix spawn rare gunBowT1IronCrossbow 6
 affix spawn rare meleeWpnBladeT1HuntingKnife 5
 affix spawn rare meleeToolPickT1IronPickaxe 6
 affix spawn rare meleeToolPickT3Auger 6
@@ -106,6 +110,8 @@ affix currency 3
 affix augment
 affix list held
 affix validate meleeWpnBladeT1HuntingKnife 5
+affix validate gunBowT1WoodenBow 6
+affix validate gunBowT1IronCrossbow 6
 affix validate meleeToolPickT1IronPickaxe 6
 affix validate meleeToolPickT3Auger 6
 affix validate armorPrimitiveHelmet 6

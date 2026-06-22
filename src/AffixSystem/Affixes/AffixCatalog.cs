@@ -8,6 +8,8 @@ namespace AffixSystem.Affixes
         private const string MeleeWeapon = "meleeWeapon";
         private const string RangedWeapon = "ranged,gun,bow,launcher";
         private const string GunWeapon = "gun";
+        private const string BowWeapon = "bow,crossbow";
+        private const string CrossbowWeapon = "crossbow";
         private const string AnyTool = "tool";
         private const string HarvestTool = "harvestingSkill,miningTool,salvageTool";
         private const string MotorTool = "motorTool";
@@ -30,6 +32,9 @@ namespace AffixSystem.Affixes
             new AffixDefinition("quickdraw", "Quickdraw", PassiveEffects.ReloadSpeedMultiplier, "reload speed", Values(10, 18, 26, 34, 42, 50), 2, 6, RangedWeapon),
             new AffixDefinition("balanced", "Balanced", PassiveEffects.WeaponHandling, "weapon handling", Values(10, 20, 30, 40, 50, 60), 3, 6, RangedWeapon),
             new AffixDefinition("executioner", "Executioner", PassiveEffects.HeadshotDamageModifier, "headshot damage", Values(10, 20, 30, 40, 50, 60), 3, 6, RangedWeapon),
+            new AffixDefinition("trueflight", "Trueflight", PassiveEffects.ProjectileVelocity, "projectile velocity", Values(8, 16, 24, 32, 40, 48), BowWeapon),
+            new AffixDefinition("broadhead", "Broadhead", PassiveEffects.EntityDamage, "bow damage", Values(6, 12, 18, 24, 30, 36), 2, 6, BowWeapon),
+            new AffixDefinition("winched", "Winched", PassiveEffects.ReloadSpeedMultiplier, "crossbow reload speed", Values(8, 16, 24, 32, 40, 48), 2, 6, CrossbowWeapon),
             new AffixDefinition("frenzied", "Frenzied", PassiveEffects.AttacksPerMinute, "attacks per minute", Values(10, 20, 30, 40, 50, 60), 2, 6, MeleeWeapon),
             new AffixDefinition("efficient", "Efficient", PassiveEffects.StaminaLoss, "stamina cost", Values(-10, -20, -30, -40, -50, -60), MeleeWeapon, AnyTool),
             new AffixDefinition("quarrying", "Quarrying", PassiveEffects.BlockDamage, "block damage", Values(10, 20, 30, 40, 50, 60), HarvestTool),

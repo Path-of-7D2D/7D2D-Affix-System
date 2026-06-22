@@ -45,6 +45,10 @@ Build properties match the other local Path-of-7D2D modlets:
 - Confirm the Q1 validation output excludes quality-gated advanced affixes such
   as `balanced` and `executioner`, while Q6 includes them.
 - Confirm gun-only affixes do not appear as legal melee weapon rolls.
+- Run `affix validate gunBowT1WoodenBow 6` and confirm bow/crossbow affixes can
+  appear, while gun-only affixes do not.
+- Run `affix validate gunBowT1IronCrossbow 6` and confirm crossbow reload
+  affixes can appear.
 - Run `affix validate meleeToolPickT1IronPickaxe 6` and confirm only tool-legal
   affixes appear.
 - Run `affix spawn rare meleeToolPickT1IronPickaxe 6`, hold it, and confirm the
