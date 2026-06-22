@@ -44,7 +44,7 @@ namespace AffixSystem.Affixes
             get
             {
                 return requiredAnyTagExpressions.Length == 0
-                    ? "any supported weapon"
+                    ? "any supported item"
                     : string.Join(" | ", requiredAnyTagExpressions);
             }
         }

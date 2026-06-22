@@ -5,9 +5,12 @@ namespace AffixSystem.Affixes
     internal static class AffixCatalog
     {
         private const string AnyWeapon = "weapon";
-        private const string MeleeWeapon = "melee,meleeWeapon";
+        private const string MeleeWeapon = "meleeWeapon";
         private const string RangedWeapon = "ranged,gun,bow,launcher";
         private const string GunWeapon = "gun";
+        private const string AnyTool = "tool";
+        private const string HarvestTool = "harvestingSkill,miningTool,salvageTool";
+        private const string MotorTool = "motorTool";
 
         private static readonly AffixDefinition[] definitions =
         {
@@ -23,7 +26,12 @@ namespace AffixSystem.Affixes
             new AffixDefinition("balanced", "Balanced", PassiveEffects.WeaponHandling, "weapon handling", Values(10, 20, 30, 40, 50, 60), RangedWeapon),
             new AffixDefinition("executioner", "Executioner", PassiveEffects.HeadshotDamageModifier, "headshot damage", Values(10, 20, 30, 40, 50, 60), RangedWeapon),
             new AffixDefinition("frenzied", "Frenzied", PassiveEffects.AttacksPerMinute, "attacks per minute", Values(10, 20, 30, 40, 50, 60), MeleeWeapon),
-            new AffixDefinition("efficient", "Efficient", PassiveEffects.StaminaLoss, "stamina cost", Values(-10, -20, -30, -40, -50, -60), MeleeWeapon)
+            new AffixDefinition("efficient", "Efficient", PassiveEffects.StaminaLoss, "stamina cost", Values(-10, -20, -30, -40, -50, -60), MeleeWeapon, AnyTool),
+            new AffixDefinition("quarrying", "Quarrying", PassiveEffects.BlockDamage, "block damage", Values(10, 20, 30, 40, 50, 60), HarvestTool),
+            new AffixDefinition("bountiful", "Bountiful", PassiveEffects.HarvestCount, "resource harvest", Values(10, 20, 30, 40, 50, 60), HarvestTool),
+            new AffixDefinition("braced", "Braced", PassiveEffects.DegradationMax, "durability", Values(20, 40, 60, 80, 100, 120), AnyTool),
+            new AffixDefinition("workhorse", "Workhorse", PassiveEffects.BlockDamage, "motor tool block damage", Values(8, 16, 24, 32, 40, 48), MotorTool),
+            new AffixDefinition("gravebreaker", "Gravebreaker", PassiveEffects.EntityDamage, "entity damage", Values(4, 8, 12, 16, 20, 24), AnyTool)
         };
 
         private static readonly Dictionary<string, AffixDefinition> byId = BuildById();

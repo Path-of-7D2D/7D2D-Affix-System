@@ -37,13 +37,13 @@ public class ItemActionAffixAugment : ItemAction
         ItemStack target = player.inventory.holdingItemStack;
         if (target == null || target.IsEmpty() || player.inventory.holdingCount <= 0)
         {
-            ShowTooltip(player, "Hold a Magic or Rare weapon in the toolbelt first.");
+            ShowTooltip(player, "Hold a Magic or Rare affixed item in the toolbelt first.");
             return false;
         }
 
         if (IsAugmentCurrency(target.itemValue))
         {
-            ShowTooltip(player, "Hold the weapon you want to augment, then use Affix Augment from inventory.");
+            ShowTooltip(player, "Hold the item you want to augment, then use Affix Augment from inventory.");
             return false;
         }
 

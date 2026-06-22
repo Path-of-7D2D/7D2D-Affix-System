@@ -33,13 +33,19 @@ Build properties match the other local Path-of-7D2D modlets:
 - Confirm the item appears in the backpack or drops at the player.
 - Confirm the item info panel shows rarity, affix tier lines, and boosted stat
   numbers.
-- Run `affix currency 2`, hold the affixed weapon in the toolbelt, then run
+- Run `affix currency 2`, hold the affixed item in the toolbelt, then run
   `affix augment`.
 - Confirm the currency count decreases and the Affixes tab shows one additional
   affix.
-- Spawn another affixed weapon, hold it in the toolbelt, and use `Affix Augment`
+- Spawn another affixed item, hold it in the toolbelt, and use `Affix Augment`
   from inventory.
 - Run `affix list held` and `affix validate gunHandgunT1Pistol 6`.
 - Confirm gun-only affixes do not appear as legal melee weapon rolls.
+- Run `affix validate meleeToolPickT1IronPickaxe 6` and confirm only tool-legal
+  affixes appear.
+- Run `affix spawn rare meleeToolPickT1IronPickaxe 6`, hold it, and confirm the
+  Affixes tab renders tool affixes and boosted tool stat numbers.
+- Run `affix currency 2`, hold the affixed tool, then use `Affix Augment` from
+  inventory.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
-  supported generated weapons roll Magic or Rare affixes.
+  supported generated weapons and tools roll Magic or Rare affixes.

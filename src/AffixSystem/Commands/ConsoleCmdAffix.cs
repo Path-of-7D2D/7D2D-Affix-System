@@ -12,7 +12,7 @@ namespace AffixSystem.Commands
     [Preserve]
     public class ConsoleCmdAffix : ConsoleCmdAbstract
     {
-        private const string DefaultWeapon = "gunHandgunT1Pistol";
+        private const string DefaultItem = "gunHandgunT1Pistol";
 
         public override bool IsExecuteOnClient => true;
 
@@ -107,7 +107,7 @@ namespace AffixSystem.Commands
         {
             return getDescription() + "\n" +
                 "Subcommands:\n" +
-                "  affix spawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]\n" +
+                "  affix spawn <magic|rare> [itemName=" + DefaultItem + "] [quality=6] [drop=false]\n" +
                 "  affix inspect\n" +
                 "  affix currency [count=1]\n" +
                 "  affix augment\n" +
@@ -119,12 +119,14 @@ namespace AffixSystem.Commands
                 "  affix spawn magic\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6\n" +
                 "  affix spawn rare meleeWpnBladeT1HuntingKnife 5\n" +
+                "  affix spawn rare meleeToolPickT1IronPickaxe 6\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6 true\n" +
                 "  affix inspect\n" +
                 "  affix currency 3\n" +
                 "  affix augment\n" +
                 "  affix list held\n" +
                 "  affix validate meleeWpnBladeT1HuntingKnife 5\n" +
+                "  affix validate meleeToolPickT1IronPickaxe 6\n" +
                 "  affix debug loot on";
         }
 
@@ -132,11 +134,11 @@ namespace AffixSystem.Commands
         {
             if (parameters.Count < 2 || !TryParseRarity(parameters[1], out AffixRarity rarity))
             {
-                Output("usage: affix spawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]");
+                Output("usage: affix spawn <magic|rare> [itemName=" + DefaultItem + "] [quality=6] [drop=false]");
                 return;
             }
 
-            string itemName = parameters.Count > 2 ? parameters[2] : DefaultWeapon;
+            string itemName = parameters.Count > 2 ? parameters[2] : DefaultItem;
             int quality = ParseQuality(parameters.Count > 3 ? parameters[3] : null);
             bool drop = parameters.Count > 4 && ConsoleHelper.ParseParamBool(parameters[4], _invalidStringsAsFalse: true);
 
@@ -175,12 +177,12 @@ namespace AffixSystem.Commands
             if (drop)
             {
                 GameManager.Instance.ItemDropServer(stack, player.position, Vector3.zero);
-                Output("Dropped affixed weapon: " + itemName + " Q" + quality);
+                Output("Dropped affixed item: " + itemName + " Q" + quality);
             }
             else
             {
                 player.bag.AddItem(stack);
-                Output("Added affixed weapon to backpack: " + itemName + " Q" + quality);
+                Output("Added affixed item to backpack: " + itemName + " Q" + quality);
             }
 
             Output(AffixDisplay.BuildSummary(state));
@@ -218,7 +220,7 @@ namespace AffixSystem.Commands
             ItemStack held = player.inventory.holdingItemStack;
             if (held == null || held.IsEmpty() || player.inventory.holdingCount <= 0)
             {
-                Output("Hold a Magic or Rare weapon in the toolbelt before running affix augment.");
+                Output("Hold a Magic or Rare affixed item in the toolbelt before running affix augment.");
                 return;
             }
 
@@ -310,7 +312,7 @@ namespace AffixSystem.Commands
             Output("Validating: " + itemName + " Q" + itemValue.Quality);
             if (!AffixEligibility.IsSupportedBaseItem(itemValue))
             {
-                Output("Unsupported affix base. Current scope only supports weapon-tagged items.");
+                Output("Unsupported affix base. Current scope supports quality weapons and tools.");
                 return;
             }
 
