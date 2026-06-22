@@ -31,6 +31,9 @@ namespace AffixSystem.Config
 
         public static string AugmentItemName { get; private set; } = DefaultAugmentItemName;
 
+        private static IntRange[] magicNaturalAffixCountsByQuality = BuildDefaultMagicCountRanges();
+        private static IntRange[] rareNaturalAffixCountsByQuality = BuildDefaultRareCountRanges();
+
         public static void Load(Mod modInstance)
         {
             ResetDefaults();
@@ -63,6 +66,11 @@ namespace AffixSystem.Config
                 MagicAffixCap = ReadInt(root, "affixCaps/magic", MagicAffixCap, 1, 6);
                 RareAffixCap = ReadInt(root, "affixCaps/rare", RareAffixCap, 1, 6);
                 AugmentItemName = ReadString(root, "currency/augmentItemName", AugmentItemName);
+
+                if (!ReadQualityCountRanges(root))
+                {
+                    FillCountRangesFromFixedCounts();
+                }
 
                 Log.Out("[AffixSystem] Loaded tuning config: " + configPath);
             }
@@ -107,6 +115,28 @@ namespace AffixSystem.Config
             return rarity == AffixRarity.Rare ? RareNaturalAffixCount : MagicNaturalAffixCount;
         }
 
+        public static int GetNaturalAffixCount(AffixRarity rarity, int quality, Random random)
+        {
+            IntRange range = GetNaturalAffixCountRange(rarity, quality);
+            if (range.Min >= range.Max || random == null)
+            {
+                return range.Min;
+            }
+
+            return random.Next(range.Min, range.Max + 1);
+        }
+
+        public static string GetNaturalAffixCountSummary(AffixRarity rarity, int quality)
+        {
+            IntRange range = GetNaturalAffixCountRange(rarity, quality);
+            if (range.Min == range.Max)
+            {
+                return range.Min.ToString(CultureInfo.InvariantCulture);
+            }
+
+            return range.Min.ToString(CultureInfo.InvariantCulture) + "-" + range.Max.ToString(CultureInfo.InvariantCulture);
+        }
+
         public static void LogLoot(string message)
         {
             if (LootDebugLogging)
@@ -126,6 +156,8 @@ namespace AffixSystem.Config
             MagicAffixCap = 3;
             RareAffixCap = 6;
             AugmentItemName = DefaultAugmentItemName;
+            magicNaturalAffixCountsByQuality = BuildDefaultMagicCountRanges();
+            rareNaturalAffixCountsByQuality = BuildDefaultRareCountRanges();
         }
 
         private static string ResolveConfigPath(Mod modInstance)
@@ -199,6 +231,142 @@ namespace AffixSystem.Config
             }
 
             return node.InnerText.Trim();
+        }
+
+        private static bool ReadQualityCountRanges(XmlNode root)
+        {
+            XmlNodeList nodes = root.SelectNodes("loot/affixCountsByQuality/quality");
+            if (nodes == null || nodes.Count == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                XmlNode node = nodes[i];
+                if (node?.Attributes == null)
+                {
+                    continue;
+                }
+
+                if (!int.TryParse(node.Attributes["value"]?.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int quality))
+                {
+                    continue;
+                }
+
+                quality = ClampQuality(quality);
+                magicNaturalAffixCountsByQuality[quality] = ReadRangeAttribute(node, "magic", magicNaturalAffixCountsByQuality[quality]);
+                rareNaturalAffixCountsByQuality[quality] = ReadRangeAttribute(node, "rare", rareNaturalAffixCountsByQuality[quality]);
+            }
+
+            return true;
+        }
+
+        private static IntRange ReadRangeAttribute(XmlNode node, string attributeName, IntRange fallback)
+        {
+            string raw = node.Attributes?[attributeName]?.Value;
+            if (string.IsNullOrEmpty(raw))
+            {
+                return fallback;
+            }
+
+            string[] parts = raw.Split(',');
+            if (!int.TryParse(parts[0].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int min))
+            {
+                return fallback;
+            }
+
+            int max = min;
+            if (parts.Length > 1 && !int.TryParse(parts[1].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out max))
+            {
+                return fallback;
+            }
+
+            min = ClampAffixCount(min);
+            max = ClampAffixCount(max);
+            if (max < min)
+            {
+                max = min;
+            }
+
+            return new IntRange(min, max);
+        }
+
+        private static IntRange GetNaturalAffixCountRange(AffixRarity rarity, int quality)
+        {
+            IntRange[] ranges = rarity == AffixRarity.Rare
+                ? rareNaturalAffixCountsByQuality
+                : magicNaturalAffixCountsByQuality;
+
+            return ranges[ClampQuality(quality)];
+        }
+
+        private static void FillCountRangesFromFixedCounts()
+        {
+            var magic = new IntRange(MagicNaturalAffixCount, MagicNaturalAffixCount);
+            var rare = new IntRange(RareNaturalAffixCount, RareNaturalAffixCount);
+            for (int quality = 1; quality <= 6; quality++)
+            {
+                magicNaturalAffixCountsByQuality[quality] = magic;
+                rareNaturalAffixCountsByQuality[quality] = rare;
+            }
+        }
+
+        private static IntRange[] BuildDefaultMagicCountRanges()
+        {
+            var ranges = new IntRange[7];
+            ranges[1] = new IntRange(1, 1);
+            ranges[2] = new IntRange(1, 2);
+            ranges[3] = new IntRange(2, 2);
+            ranges[4] = new IntRange(2, 2);
+            ranges[5] = new IntRange(2, 2);
+            ranges[6] = new IntRange(2, 2);
+            return ranges;
+        }
+
+        private static IntRange[] BuildDefaultRareCountRanges()
+        {
+            var ranges = new IntRange[7];
+            ranges[1] = new IntRange(2, 2);
+            ranges[2] = new IntRange(2, 3);
+            ranges[3] = new IntRange(3, 3);
+            ranges[4] = new IntRange(3, 4);
+            ranges[5] = new IntRange(3, 5);
+            ranges[6] = new IntRange(3, 6);
+            return ranges;
+        }
+
+        private static int ClampQuality(int quality)
+        {
+            if (quality < 1)
+            {
+                return 1;
+            }
+
+            return quality > 6 ? 6 : quality;
+        }
+
+        private static int ClampAffixCount(int count)
+        {
+            if (count < 1)
+            {
+                return 1;
+            }
+
+            return count > 6 ? 6 : count;
+        }
+
+        private readonly struct IntRange
+        {
+            public IntRange(int min, int max)
+            {
+                Min = min;
+                Max = max;
+            }
+
+            public int Min { get; }
+
+            public int Max { get; }
         }
     }
 }

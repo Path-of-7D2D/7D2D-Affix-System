@@ -107,8 +107,9 @@ affix debug loot on
 `Affix Augment` can be used from inventory while the target Magic or Rare item
 is selected in the toolbelt. The `affix augment` command does the same thing as
 a console fallback and consumes one `Affix Augment` from the toolbelt or
-backpack. By default, generated Magic items roll 2 affixes and can be augmented
-up to 3. Generated Rare items roll 4 affixes and can be augmented up to 6.
+backpack. By default, generated Magic items roll 1-2 affixes based on quality
+and can be augmented up to 3. Generated Rare items roll 2-6 affixes based on
+quality and can be augmented up to 6.
 
 Use `affix list held` or `affix validate` to inspect which affixes can still
 roll on the held item. Use `affix validate <itemName> <quality>` to inspect a
@@ -124,7 +125,8 @@ Config/affix_tuning.xml
 ```
 
 The file controls generated-loot rolling, loot debug logging, Magic/Rare rarity
-weights, natural affix counts, augment caps, and the augment currency item name.
+weights, quality-based natural affix count ranges, augment caps, and the augment
+currency item name.
 After editing the file in a running world, use:
 
 ```text

@@ -11,6 +11,14 @@
       <magic>2</magic>
       <rare>4</rare>
     </affixCounts>
+    <affixCountsByQuality>
+      <quality value="1" magic="1" rare="2"/>
+      <quality value="2" magic="1,2" rare="2,3"/>
+      <quality value="3" magic="2" rare="3"/>
+      <quality value="4" magic="2" rare="3,4"/>
+      <quality value="5" magic="2" rare="3,5"/>
+      <quality value="6" magic="2" rare="3,6"/>
+    </affixCountsByQuality>
   </loot>
   <affixCaps>
     <magic>3</magic>

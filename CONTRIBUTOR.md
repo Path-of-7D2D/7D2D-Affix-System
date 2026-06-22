@@ -40,6 +40,8 @@ Build properties match the other local Path-of-7D2D modlets:
 - Spawn another affixed item, hold it in the toolbelt, and use `Affix Augment`
   from inventory.
 - Run `affix list held` and `affix validate gunHandgunT1Pistol 6`.
+- Run `affix validate gunHandgunT1Pistol 1` and `affix validate gunHandgunT1Pistol 6`
+  and confirm natural affix count output changes by quality.
 - Confirm gun-only affixes do not appear as legal melee weapon rolls.
 - Run `affix validate meleeToolPickT1IronPickaxe 6` and confirm only tool-legal
   affixes appear.

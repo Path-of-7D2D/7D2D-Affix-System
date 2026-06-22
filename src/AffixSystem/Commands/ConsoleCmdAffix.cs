@@ -166,7 +166,8 @@ namespace AffixSystem.Commands
             }
 
             var random = new System.Random(unchecked(Environment.TickCount ^ itemValue.Seed ^ (int)DateTime.UtcNow.Ticks));
-            AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, AffixTuning.GetNaturalAffixCount(rarity));
+            int affixCount = AffixTuning.GetNaturalAffixCount(rarity, quality, random);
+            AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount);
             if (state.Affixes.Count == 0)
             {
                 Output("No legal affixes were available for " + itemName + ".");
@@ -330,7 +331,10 @@ namespace AffixSystem.Commands
             else
             {
                 Output("No stored Magic/Rare affix state on this item.");
-                Output("Natural counts: Magic " + AffixTuning.GetNaturalAffixCount(AffixRarity.Magic) + ", Rare " + AffixTuning.GetNaturalAffixCount(AffixRarity.Rare));
+                Output("Natural counts for Q" + itemValue.Quality + ": Magic " +
+                    AffixTuning.GetNaturalAffixCountSummary(AffixRarity.Magic, (int)itemValue.Quality) +
+                    ", Rare " +
+                    AffixTuning.GetNaturalAffixCountSummary(AffixRarity.Rare, (int)itemValue.Quality));
             }
 
             IReadOnlyList<AffixInstance> existingAffixes = existingState?.Affixes;
