@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using AffixSystem.Affixes;
 using AffixSystem.Config;
 using Platform;
@@ -62,6 +63,18 @@ namespace AffixSystem.Commands
                 return;
             }
 
+            if (subcommand.Equals("list", StringComparison.OrdinalIgnoreCase))
+            {
+                ListAffixes(_params);
+                return;
+            }
+
+            if (subcommand.Equals("validate", StringComparison.OrdinalIgnoreCase))
+            {
+                ValidateAffixPool(_params);
+                return;
+            }
+
             if (subcommand.Equals("debug", StringComparison.OrdinalIgnoreCase))
             {
                 Debug(_params);
@@ -87,7 +100,7 @@ namespace AffixSystem.Commands
 
         public override string getDescription()
         {
-            return "usage: affix <spawn|inspect|currency|augment|debug|reload|help>";
+            return "usage: affix <spawn|inspect|currency|augment|list|validate|debug|reload|help>";
         }
 
         public override string getHelp()
@@ -98,6 +111,8 @@ namespace AffixSystem.Commands
                 "  affix inspect\n" +
                 "  affix currency [count=1]\n" +
                 "  affix augment\n" +
+                "  affix list [all|held]\n" +
+                "  affix validate [itemName] [quality=6]\n" +
                 "  affix debug loot <on|off>\n" +
                 "  affix reload\n" +
                 "Examples:\n" +
@@ -108,6 +123,8 @@ namespace AffixSystem.Commands
                 "  affix inspect\n" +
                 "  affix currency 3\n" +
                 "  affix augment\n" +
+                "  affix list held\n" +
+                "  affix validate meleeWpnBladeT1HuntingKnife 5\n" +
                 "  affix debug loot on";
         }
 
@@ -267,6 +284,96 @@ namespace AffixSystem.Commands
             Output(AffixDisplay.BuildSummary(state));
         }
 
+        private static void ListAffixes(List<string> parameters)
+        {
+            if (parameters.Count > 1 && parameters[1].Equals("held", StringComparison.OrdinalIgnoreCase))
+            {
+                ValidateAffixPool(new List<string> { "validate" });
+                return;
+            }
+
+            Output("Affix catalog (" + AffixCatalog.All.Count + "):");
+            for (int i = 0; i < AffixCatalog.All.Count; i++)
+            {
+                AffixDefinition definition = AffixCatalog.All[i];
+                Output(definition.Id + " - " + definition.DisplayName + " (" + definition.StatLabel + "), allowed: " + definition.RequirementSummary);
+            }
+        }
+
+        private static void ValidateAffixPool(List<string> parameters)
+        {
+            if (!TryGetValidationItem(parameters, out ItemValue itemValue, out string itemName))
+            {
+                return;
+            }
+
+            Output("Validating: " + itemName + " Q" + itemValue.Quality);
+            if (!AffixEligibility.IsSupportedBaseItem(itemValue))
+            {
+                Output("Unsupported affix base. Current scope only supports weapon-tagged items.");
+                return;
+            }
+
+            AffixItemState existingState = null;
+            AffixItemState.TryReadDisplayable(itemValue, out existingState);
+
+            if (existingState != null)
+            {
+                int cap = AffixTuning.GetAffixCap(existingState.Rarity);
+                Output("Stored rarity: " + existingState.Rarity + ", affixes: " + existingState.Affixes.Count + "/" + cap);
+                Output(AffixDisplay.BuildSummary(existingState));
+            }
+            else
+            {
+                Output("No stored Magic/Rare affix state on this item.");
+                Output("Natural counts: Magic " + AffixTuning.GetNaturalAffixCount(AffixRarity.Magic) + ", Rare " + AffixTuning.GetNaturalAffixCount(AffixRarity.Rare));
+            }
+
+            IReadOnlyList<AffixInstance> existingAffixes = existingState?.Affixes;
+            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue, existingAffixes);
+            Output("Legal new affixes (" + legal.Count + "): " + BuildAffixDefinitionList(legal));
+        }
+
+        private static bool TryGetValidationItem(List<string> parameters, out ItemValue itemValue, out string itemName)
+        {
+            itemValue = null;
+            itemName = null;
+
+            if (parameters.Count > 1)
+            {
+                itemName = parameters[1];
+                int quality = ParseQuality(parameters.Count > 2 ? parameters[2] : null);
+                ItemValue lookup = ItemClass.GetItem(itemName, _caseInsensitive: true);
+                if (lookup.IsEmpty())
+                {
+                    Output("Unknown item name: " + itemName);
+                    return false;
+                }
+
+                itemValue = new ItemValue(lookup.type, quality, quality, _bCreateDefaultModItems: false);
+                return true;
+            }
+
+            EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
+            if (player == null)
+            {
+                Output("No local player is available.");
+                return false;
+            }
+
+            ItemStack held = player.inventory.holdingItemStack;
+            if (held == null || held.IsEmpty() || player.inventory.holdingCount <= 0)
+            {
+                Output("Hold an item in the toolbelt or pass an item name.");
+                return false;
+            }
+
+            itemValue = held.itemValue;
+            ItemClass itemClass = itemValue.ItemClass;
+            itemName = itemClass != null ? itemClass.GetItemName() : itemValue.type.ToString();
+            return true;
+        }
+
         private static void Debug(List<string> parameters)
         {
             if (parameters.Count < 3 || !parameters[1].Equals("loot", StringComparison.OrdinalIgnoreCase))
@@ -401,6 +508,27 @@ namespace AffixSystem.Commands
 
             player.bag.DecItem(currency, 1, false, null);
             return CountCurrency(player, currency) < before;
+        }
+
+        private static string BuildAffixDefinitionList(List<AffixDefinition> definitions)
+        {
+            if (definitions.Count == 0)
+            {
+                return "none";
+            }
+
+            var builder = new StringBuilder();
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(", ");
+                }
+
+                builder.Append(definitions[i].Id);
+            }
+
+            return builder.ToString();
         }
 
         private static void Output(string message)

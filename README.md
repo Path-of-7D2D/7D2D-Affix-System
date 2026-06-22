@@ -16,7 +16,9 @@ or Rare weapon.
 - Applies affix values through `ItemValue` stat boosts.
 - Adds a star Affixes tab next to Stats and Description in the item info panel.
 - Shows affix rarity, affix names, tier colors, and rolled values in that tab.
-- Adds a prototype `Affix Augment` currency item.
+- Adds a prototype `Affix Augment` currency item with an inventory use action.
+- Keeps weapon affix pools scoped by item category so melee-only and gun-only
+  stats do not roll on the wrong weapon type.
 
 ## Install
 
@@ -56,6 +58,8 @@ affix spawn <magic|rare> [itemName=gunHandgunT1Pistol] [quality=6] [drop=false]
 affix inspect
 affix currency [count=1]
 affix augment
+affix list [all|held]
+affix validate [itemName] [quality=6]
 affix debug loot <on|off>
 affix reload
 ```
@@ -76,15 +80,22 @@ affix spawn rare gunHandgunT1Pistol 6 true
 affix inspect
 affix currency 3
 affix augment
+affix list held
+affix validate meleeWpnBladeT1HuntingKnife 5
 affix debug loot on
 ```
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
 
-`affix augment` targets the currently held toolbelt item and consumes one
-`Affix Augment` from the toolbelt or backpack. By default, generated Magic items
-roll 2 affixes and can be augmented up to 3. Generated Rare items roll 4 affixes
-and can be augmented up to 6.
+`Affix Augment` can be used from inventory while the target Magic or Rare weapon
+is selected in the toolbelt. The `affix augment` command does the same thing as
+a console fallback and consumes one `Affix Augment` from the toolbelt or
+backpack. By default, generated Magic items roll 2 affixes and can be augmented
+up to 3. Generated Rare items roll 4 affixes and can be augmented up to 6.
+
+Use `affix list held` or `affix validate` to inspect which affixes can still
+roll on the held item. Use `affix validate <itemName> <quality>` to inspect a
+specific base item without spawning it.
 
 ## Tuning
 

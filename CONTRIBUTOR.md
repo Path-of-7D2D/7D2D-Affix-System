@@ -37,5 +37,9 @@ Build properties match the other local Path-of-7D2D modlets:
   `affix augment`.
 - Confirm the currency count decreases and the Affixes tab shows one additional
   affix.
+- Spawn another affixed weapon, hold it in the toolbelt, and use `Affix Augment`
+  from inventory.
+- Run `affix list held` and `affix validate gunHandgunT1Pistol 6`.
+- Confirm gun-only affixes do not appear as legal melee weapon rolls.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
   supported generated weapons roll Magic or Rare affixes.
