@@ -119,7 +119,7 @@ namespace AffixSystem.Patches
             SetSelected(instance.statButton, false);
             SetSelected(instance.descriptionButton, false);
             SyncAffixControls(instance);
-            instance.IsDirty = true;
+            RefreshTabBindings(instance);
         }
 
         public static void ClearAffixSelection(XUiC_ItemInfoWindow instance)
@@ -128,7 +128,7 @@ namespace AffixSystem.Patches
             state.ShowAffixes = false;
             SetViewVisible(state.AffixPanel, false);
             SetSelected(state.AffixButton, false);
-            instance.IsDirty = true;
+            RefreshTabBindings(instance);
         }
 
         public static void SyncAffixControls(XUiC_ItemInfoWindow instance)
@@ -222,6 +222,18 @@ namespace AffixSystem.Patches
             {
                 controller.ViewComponent.IsVisible = visible;
             }
+        }
+
+        private static void RefreshTabBindings(XUiC_ItemInfoWindow instance)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            instance.IsDirty = true;
+            instance.RefreshBindings();
+            SyncAffixControls(instance);
         }
 
         private static void SetSelected(XUiController controller, bool selected)
