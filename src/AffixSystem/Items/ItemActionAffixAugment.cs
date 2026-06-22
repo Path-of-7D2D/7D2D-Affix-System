@@ -57,7 +57,7 @@ public class ItemActionAffixAugment : ItemAction
 
         ConsumeSourceStack(sourceStack);
         RefreshUi(player, uiItemStack);
-        ShowTooltip(player, message + " " + AffixDisplay.BuildSummary(newState));
+        ShowTooltip(player, message);
         return true;
     }
 

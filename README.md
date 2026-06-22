@@ -19,6 +19,8 @@ or Rare item.
 - Displays Magic item names with their leading affix and Rare item names with
   affix-derived prefix/suffix identity.
 - Adds a prototype `Affix Augment` currency item with an inventory use action.
+- Reports the added affix and resulting affix count/cap when an augment
+  succeeds.
 - Keeps weapon affix pools scoped by item category so melee-only and gun-only
   stats do not roll on the wrong weapon type.
 - Adds bow/crossbow-specific affixes for projectile velocity, bow damage, and

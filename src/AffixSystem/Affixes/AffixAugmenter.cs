@@ -41,7 +41,7 @@ namespace AffixSystem.Affixes
             newState = new AffixItemState(currentState.Rarity, affixes);
             newState.WriteTo(itemValue);
 
-            message = "Added " + FormatAddedAffix(addedAffix) + ".";
+            message = "Added " + FormatAddedAffix(addedAffix) + " Affixes: " + newState.Affixes.Count + "/" + cap + ".";
             return true;
         }
 
