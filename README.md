@@ -153,6 +153,7 @@ Config/affix_tuning.xml
 The file controls generated-loot rolling, loot debug logging, Magic/Rare rarity
 weights, high-risk loot source rarity bias, quality-based natural affix count
 ranges, augment caps, and the augment currency item name.
+Natural roll counts are clamped by the configured Magic/Rare caps.
 After editing the file in a running world, use:
 
 ```text

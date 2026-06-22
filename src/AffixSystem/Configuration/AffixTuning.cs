@@ -167,12 +167,13 @@ namespace AffixSystem.Config
 
         public static int GetNaturalAffixCount(AffixRarity rarity)
         {
-            return rarity == AffixRarity.Rare ? RareNaturalAffixCount : MagicNaturalAffixCount;
+            int count = rarity == AffixRarity.Rare ? RareNaturalAffixCount : MagicNaturalAffixCount;
+            return Math.Min(count, GetAffixCap(rarity));
         }
 
         public static int GetNaturalAffixCount(AffixRarity rarity, int quality, Random random)
         {
-            IntRange range = GetNaturalAffixCountRange(rarity, quality);
+            IntRange range = ClampRangeToAffixCap(GetNaturalAffixCountRange(rarity, quality), rarity);
             if (range.Min >= range.Max || random == null)
             {
                 return range.Min;
@@ -183,7 +184,7 @@ namespace AffixSystem.Config
 
         public static string GetNaturalAffixCountSummary(AffixRarity rarity, int quality)
         {
-            IntRange range = GetNaturalAffixCountRange(rarity, quality);
+            IntRange range = ClampRangeToAffixCap(GetNaturalAffixCountRange(rarity, quality), rarity);
             if (range.Min == range.Max)
             {
                 return range.Min.ToString(CultureInfo.InvariantCulture);
@@ -380,6 +381,19 @@ namespace AffixSystem.Config
                 : magicNaturalAffixCountsByQuality;
 
             return ranges[ClampQuality(quality)];
+        }
+
+        private static IntRange ClampRangeToAffixCap(IntRange range, AffixRarity rarity)
+        {
+            int cap = GetAffixCap(rarity);
+            int min = Math.Min(range.Min, cap);
+            int max = Math.Min(range.Max, cap);
+            if (max < min)
+            {
+                max = min;
+            }
+
+            return new IntRange(min, max);
         }
 
         private static void FillCountRangesFromFixedCounts()
