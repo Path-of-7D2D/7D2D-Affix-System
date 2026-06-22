@@ -48,6 +48,12 @@ Usage:
 affixspawn <magic|rare> [itemName=gunHandgunT1Pistol] [quality=6] [drop=false]
 ```
 
+Alias:
+
+```text
+affixgive
+```
+
 Examples:
 
 ```text
@@ -58,4 +64,3 @@ affixspawn rare gunHandgunT1Pistol 6 true
 ```
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
-
