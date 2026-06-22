@@ -2,10 +2,9 @@
 <xml>
 	<Name value="AffixSystem" />
 	<DisplayName value="Affix System" />
-	<Description value="Adds command-spawned prototype Magic and Rare affixed weapons." />
+	<Description value="Adds prototype Magic and Rare affixed weapons, generated-loot rolls, and augment currency testing commands." />
 	<Author value="Path-of-7D2D" />
 	<Version value="0.1.0" />
 	<Website value="https://github.com/Path-of-7D2D/7D2D-Affix-System" />
 	<SkipWithAntiCheat value="true" />
 </xml>
-

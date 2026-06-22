@@ -2,18 +2,21 @@
 
 Barebones affix prototype for 7 Days to Die V3.0.
 
-This first pass focuses on command-spawned affixed weapons so the storage,
-display, and stat-modification pipeline can be tested before loot generation is
-hooked up.
+This pass supports command-spawned affixed weapons, fresh generated loot rolls,
+and a prototype augment currency for adding one new affix to an existing Magic
+or Rare weapon.
 
 ## Features
 
 - Adds a Harmony-backed modlet.
 - Adds a cheat command for spawning Magic or Rare weapons.
+- Rolls Magic or Rare affixes onto newly generated loot container and loot bag
+  weapons.
 - Stores affix state on the item instance.
 - Applies affix values through `ItemValue` stat boosts.
 - Adds a star Affixes tab next to Stats and Description in the item info panel.
 - Shows affix rarity, affix names, tier colors, and rolled values in that tab.
+- Adds a prototype `Affix Augment` currency item.
 
 ## Install
 
@@ -35,7 +38,7 @@ live game install:
 
 EasyAntiCheat must be disabled.
 
-## Test Command
+## Test Commands
 
 Open the F1 console in a world and run:
 
@@ -50,6 +53,11 @@ Usage:
 
 ```text
 affix spawn <magic|rare> [itemName=gunHandgunT1Pistol] [quality=6] [drop=false]
+affix inspect
+affix currency [count=1]
+affix augment
+affix debug loot <on|off>
+affix reload
 ```
 
 Inspect the currently held toolbelt item:
@@ -66,9 +74,33 @@ affix spawn rare gunHandgunT1Pistol 6
 affix spawn rare meleeWpnBladeT1HuntingKnife 5
 affix spawn rare gunHandgunT1Pistol 6 true
 affix inspect
+affix currency 3
+affix augment
+affix debug loot on
 ```
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
+
+`affix augment` targets the currently held toolbelt item and consumes one
+`Affix Augment` from the toolbelt or backpack. By default, generated Magic items
+roll 2 affixes and can be augmented up to 3. Generated Rare items roll 4 affixes
+and can be augmented up to 6.
+
+## Tuning
+
+Runtime tuning lives in:
+
+```text
+Config/affix_tuning.xml
+```
+
+The file controls generated-loot rolling, loot debug logging, Magic/Rare rarity
+weights, natural affix counts, augment caps, and the augment currency item name.
+After editing the file in a running world, use:
+
+```text
+affix reload
+```
 
 ## License
 

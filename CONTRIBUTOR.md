@@ -33,3 +33,9 @@ Build properties match the other local Path-of-7D2D modlets:
 - Confirm the item appears in the backpack or drops at the player.
 - Confirm the item info panel shows rarity, affix tier lines, and boosted stat
   numbers.
+- Run `affix currency 2`, hold the affixed weapon in the toolbelt, then run
+  `affix augment`.
+- Confirm the currency count decreases and the Affixes tab shows one additional
+  affix.
+- Run `affix debug loot on`, open a never-opened loot container, and confirm
+  supported generated weapons roll Magic or Rare affixes.
