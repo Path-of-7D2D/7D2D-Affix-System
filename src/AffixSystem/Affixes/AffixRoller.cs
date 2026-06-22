@@ -8,6 +8,12 @@ namespace AffixSystem.Affixes
         public static AffixItemState Roll(ItemValue itemValue, AffixRarity rarity, Random random)
         {
             int affixCount = rarity == AffixRarity.Rare ? 4 : 2;
+            return Roll(itemValue, rarity, random, affixCount);
+        }
+
+        public static AffixItemState Roll(ItemValue itemValue, AffixRarity rarity, Random random, int affixCount)
+        {
+            affixCount = Math.Max(1, affixCount);
             int maxTier = Math.Max(1, Math.Min(6, (int)itemValue.Quality));
             var legal = new List<AffixDefinition>();
 
