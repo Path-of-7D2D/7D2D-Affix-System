@@ -29,8 +29,7 @@ Build properties match the other local Path-of-7D2D modlets:
 - Build in Release.
 - Launch the game with EasyAntiCheat off.
 - Load a world.
-- Run `affixspawn rare`.
+- Run `affix spawn rare`.
 - Confirm the item appears in the backpack or drops at the player.
 - Confirm the item info panel shows rarity, affix tier lines, and boosted stat
   numbers.
-

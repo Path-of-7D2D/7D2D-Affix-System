@@ -40,7 +40,7 @@ EasyAntiCheat must be disabled.
 Open the F1 console in a world and run:
 
 ```text
-affixspawn rare
+affix spawn rare
 ```
 
 Open the item info panel for the spawned weapon and click the star icon beside
@@ -49,22 +49,23 @@ Stats and Description to inspect rolled affixes.
 Usage:
 
 ```text
-affixspawn <magic|rare> [itemName=gunHandgunT1Pistol] [quality=6] [drop=false]
+affix spawn <magic|rare> [itemName=gunHandgunT1Pistol] [quality=6] [drop=false]
 ```
 
-Alias:
+Inspect the currently held toolbelt item:
 
 ```text
-affixgive
+affix inspect
 ```
 
 Examples:
 
 ```text
-affixspawn magic
-affixspawn rare gunHandgunT1Pistol 6
-affixspawn rare meleeWpnBladeT1HuntingKnife 5
-affixspawn rare gunHandgunT1Pistol 6 true
+affix spawn magic
+affix spawn rare gunHandgunT1Pistol 6
+affix spawn rare meleeWpnBladeT1HuntingKnife 5
+affix spawn rare gunHandgunT1Pistol 6 true
+affix inspect
 ```
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.

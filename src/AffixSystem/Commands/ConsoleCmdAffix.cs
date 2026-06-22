@@ -8,7 +8,7 @@ using UnityEngine.Scripting;
 namespace AffixSystem.Commands
 {
     [Preserve]
-    public class ConsoleCmdAffixSpawn : ConsoleCmdAbstract
+    public class ConsoleCmdAffix : ConsoleCmdAbstract
     {
         private const string DefaultWeapon = "gunHandgunT1Pistol";
 
@@ -19,26 +19,76 @@ namespace AffixSystem.Commands
 
         public override string[] getCommands()
         {
-            return new[] { "affixspawn", "affixgive" };
+            return new[] { "affix" };
         }
 
         public override void Execute(List<string> _params, CommandSenderInfo _senderInfo)
         {
             if (GameManager.IsDedicatedServer)
             {
-                Output("affixspawn must be executed on a client.");
+                Output("affix must be executed on a client.");
                 return;
             }
 
-            if (_params.Count < 1 || !TryParseRarity(_params[0], out AffixRarity rarity))
+            if (_params.Count < 1)
             {
                 Output(getDescription());
                 return;
             }
 
-            string itemName = _params.Count > 1 ? _params[1] : DefaultWeapon;
-            int quality = ParseQuality(_params.Count > 2 ? _params[2] : null);
-            bool drop = _params.Count > 3 && ConsoleHelper.ParseParamBool(_params[3], _invalidStringsAsFalse: true);
+            string subcommand = _params[0];
+            if (subcommand.Equals("spawn", StringComparison.OrdinalIgnoreCase))
+            {
+                Spawn(_params);
+                return;
+            }
+
+            if (subcommand.Equals("inspect", StringComparison.OrdinalIgnoreCase))
+            {
+                InspectHeldItem();
+                return;
+            }
+
+            if (subcommand.Equals("help", StringComparison.OrdinalIgnoreCase))
+            {
+                Output(getHelp());
+                return;
+            }
+
+            Output("Unknown affix subcommand: " + subcommand);
+            Output(getDescription());
+        }
+
+        public override string getDescription()
+        {
+            return "usage: affix <spawn|inspect|help>";
+        }
+
+        public override string getHelp()
+        {
+            return getDescription() + "\n" +
+                "Subcommands:\n" +
+                "  affix spawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]\n" +
+                "  affix inspect\n" +
+                "Examples:\n" +
+                "  affix spawn magic\n" +
+                "  affix spawn rare gunHandgunT1Pistol 6\n" +
+                "  affix spawn rare meleeWpnBladeT1HuntingKnife 5\n" +
+                "  affix spawn rare gunHandgunT1Pistol 6 true\n" +
+                "  affix inspect";
+        }
+
+        private static void Spawn(List<string> parameters)
+        {
+            if (parameters.Count < 2 || !TryParseRarity(parameters[1], out AffixRarity rarity))
+            {
+                Output("usage: affix spawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]");
+                return;
+            }
+
+            string itemName = parameters.Count > 2 ? parameters[2] : DefaultWeapon;
+            int quality = ParseQuality(parameters.Count > 3 ? parameters[3] : null);
+            bool drop = parameters.Count > 4 && ConsoleHelper.ParseParamBool(parameters[4], _invalidStringsAsFalse: true);
 
             EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
             if (player == null)
@@ -55,9 +105,9 @@ namespace AffixSystem.Commands
             }
 
             ItemValue itemValue = new ItemValue(lookup.type, quality, quality, _bCreateDefaultModItems: false);
-            if (!IsWeapon(itemValue))
+            if (!AffixEligibility.IsSupportedBaseItem(itemValue))
             {
-                Output(itemName + " is not tagged as a weapon.");
+                Output(itemName + " is not a supported affix base item.");
                 return;
             }
 
@@ -86,19 +136,34 @@ namespace AffixSystem.Commands
             Output(AffixDisplay.BuildSummary(state));
         }
 
-        public override string getDescription()
+        private static void InspectHeldItem()
         {
-            return "usage: affixspawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]";
-        }
+            EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
+            if (player == null)
+            {
+                Output("No local player is available.");
+                return;
+            }
 
-        public override string getHelp()
-        {
-            return getDescription() + "\n" +
-                "Examples:\n" +
-                "  affixspawn magic\n" +
-                "  affixspawn rare gunHandgunT1Pistol 6\n" +
-                "  affixspawn rare meleeWpnBladeT1HuntingKnife 5\n" +
-                "  affixspawn rare gunHandgunT1Pistol 6 true";
+            ItemStack held = player.inventory.holdingItemStack;
+            if (held == null || held.IsEmpty() || player.inventory.holdingCount <= 0)
+            {
+                Output("Hold an item in the toolbelt before running affix inspect.");
+                return;
+            }
+
+            ItemValue itemValue = held.itemValue;
+            ItemClass itemClass = itemValue.ItemClass;
+            string itemName = itemClass != null ? itemClass.GetLocalizedItemName() : itemValue.type.ToString();
+
+            Output("Held item: " + itemName + " Q" + itemValue.Quality);
+            if (!AffixEligibility.TryGetDisplayableState(itemValue, out AffixItemState state))
+            {
+                Output("No Magic or Rare affixes are stored on this item.");
+                return;
+            }
+
+            Output(AffixDisplay.BuildSummary(state));
         }
 
         private static bool TryParseRarity(string raw, out AffixRarity rarity)
@@ -137,12 +202,6 @@ namespace AffixSystem.Commands
             }
 
             return quality;
-        }
-
-        private static bool IsWeapon(ItemValue itemValue)
-        {
-            ItemClass itemClass = itemValue.ItemClass;
-            return itemClass != null && itemClass.HasAnyTags(FastTags<TagGroup.Global>.Parse("weapon"));
         }
 
         private static void Output(string message)
