@@ -12,6 +12,9 @@ namespace AffixSystem.Patches
         {
             ItemInfoWindowAffixViewState state = ItemInfoWindowPatches.GetState(__instance);
             state.AffixButton = __instance.GetChildById("affixButton");
+            state.AffixPanel = __instance.GetChildById("affixPanel");
+            state.AffixHeaderLabel = __instance.GetChildById("affixHeader");
+            state.AffixDescriptionLabel = __instance.GetChildById("affixDescription");
 
             if (state.AffixButton != null && !state.IsHooked)
             {
@@ -19,6 +22,8 @@ namespace AffixSystem.Patches
                 state.AffixButton.OnPress += (_, _) => ItemInfoWindowPatches.SelectAffixes(owner);
                 state.IsHooked = true;
             }
+
+            ItemInfoWindowPatches.SyncAffixControls(__instance);
         }
     }
 
@@ -45,10 +50,7 @@ namespace AffixSystem.Patches
     {
         private static void Postfix(XUiC_ItemInfoWindow __instance)
         {
-            if (!ItemInfoWindowPatches.HasAffixes(__instance))
-            {
-                ItemInfoWindowPatches.ClearAffixSelection(__instance);
-            }
+            ItemInfoWindowPatches.SyncAffixControls(__instance);
         }
     }
 
@@ -72,14 +74,14 @@ namespace AffixSystem.Patches
                 return;
             }
 
-            if (!AffixItemState.TryRead(__instance.itemStack.itemValue, out AffixItemState state))
+            if (!AffixItemState.TryRead(__instance.itemStack.itemValue, out AffixItemState affixState))
             {
                 return;
             }
 
             if (bindingName.Equals("itemname", StringComparison.OrdinalIgnoreCase))
             {
-                value = AffixDisplay.BuildItemName(value, state);
+                value = AffixDisplay.BuildItemName(value, affixState);
                 return;
             }
 
@@ -104,7 +106,7 @@ namespace AffixSystem.Patches
 
         public static void SelectAffixes(XUiC_ItemInfoWindow instance)
         {
-            if (!HasAffixes(instance))
+            if (!TryGetDisplayableAffixes(instance, out _))
             {
                 ClearAffixSelection(instance);
                 return;
@@ -116,7 +118,7 @@ namespace AffixSystem.Patches
             instance.showStats = false;
             SetSelected(instance.statButton, false);
             SetSelected(instance.descriptionButton, false);
-            SetSelected(state.AffixButton, true);
+            SyncAffixControls(instance);
             instance.IsDirty = true;
         }
 
@@ -124,20 +126,37 @@ namespace AffixSystem.Patches
         {
             ItemInfoWindowAffixViewState state = GetState(instance);
             state.ShowAffixes = false;
+            SetViewVisible(state.AffixPanel, false);
             SetSelected(state.AffixButton, false);
             instance.IsDirty = true;
         }
 
+        public static void SyncAffixControls(XUiC_ItemInfoWindow instance)
+        {
+            ItemInfoWindowAffixViewState state = GetState(instance);
+            bool hasAffixes = TryGetDisplayableAffixes(instance, out AffixItemState affixState);
+
+            if (!hasAffixes)
+            {
+                state.ShowAffixes = false;
+            }
+
+            SetViewVisible(state.AffixButton, hasAffixes);
+            SetViewVisible(state.AffixPanel, hasAffixes && state.ShowAffixes);
+            SetSelected(state.AffixButton, hasAffixes && state.ShowAffixes);
+
+            SetLabelText(state.AffixHeaderLabel, hasAffixes ? AffixDisplay.BuildAffixHeader(affixState) : string.Empty);
+            SetLabelText(state.AffixDescriptionLabel, hasAffixes ? AffixDisplay.BuildAffixDetails(affixState) : string.Empty);
+        }
+
         public static bool HasAffixes(XUiC_ItemInfoWindow instance)
         {
-            return instance?.itemStack != null &&
-                   !instance.itemStack.IsEmpty() &&
-                   AffixItemState.TryRead(instance.itemStack.itemValue, out _);
+            return TryGetDisplayableAffixes(instance, out _);
         }
 
         public static bool IsShowingAffixes(XUiC_ItemInfoWindow instance)
         {
-            return GetState(instance).ShowAffixes && HasAffixes(instance);
+            return GetState(instance).ShowAffixes && TryGetDisplayableAffixes(instance, out _);
         }
 
         public static bool TryHandleCustomBinding(
@@ -162,7 +181,7 @@ namespace AffixSystem.Patches
 
             if (bindingName.Equals("affixheader", StringComparison.OrdinalIgnoreCase))
             {
-                value = AffixItemState.TryRead(instance.itemStack.itemValue, out AffixItemState state)
+                value = TryGetDisplayableAffixes(instance, out AffixItemState state)
                     ? AffixDisplay.BuildAffixHeader(state)
                     : string.Empty;
                 result = true;
@@ -171,7 +190,7 @@ namespace AffixSystem.Patches
 
             if (bindingName.Equals("affixdescription", StringComparison.OrdinalIgnoreCase))
             {
-                value = AffixItemState.TryRead(instance.itemStack.itemValue, out AffixItemState state)
+                value = TryGetDisplayableAffixes(instance, out AffixItemState state)
                     ? AffixDisplay.BuildAffixDetails(state)
                     : string.Empty;
                 result = true;
@@ -181,6 +200,30 @@ namespace AffixSystem.Patches
             return false;
         }
 
+        private static bool TryGetDisplayableAffixes(XUiC_ItemInfoWindow instance, out AffixItemState state)
+        {
+            state = null;
+            if (instance?.itemStack == null || instance.itemStack.IsEmpty())
+            {
+                return false;
+            }
+
+            if (!AffixItemState.TryRead(instance.itemStack.itemValue, out state))
+            {
+                return false;
+            }
+
+            return state.Rarity == AffixRarity.Magic || state.Rarity == AffixRarity.Rare;
+        }
+
+        private static void SetViewVisible(XUiController controller, bool visible)
+        {
+            if (controller?.ViewComponent != null)
+            {
+                controller.ViewComponent.IsVisible = visible;
+            }
+        }
+
         private static void SetSelected(XUiController controller, bool selected)
         {
             if (controller?.ViewComponent is XUiV_Button button)
@@ -188,11 +231,25 @@ namespace AffixSystem.Patches
                 button.Selected = selected;
             }
         }
+
+        private static void SetLabelText(XUiController controller, string text)
+        {
+            if (controller?.ViewComponent is XUiV_Label label)
+            {
+                label.Text = text;
+            }
+        }
     }
 
     internal sealed class ItemInfoWindowAffixViewState
     {
         public XUiController AffixButton { get; set; }
+
+        public XUiController AffixPanel { get; set; }
+
+        public XUiController AffixHeaderLabel { get; set; }
+
+        public XUiController AffixDescriptionLabel { get; set; }
 
         public bool IsHooked { get; set; }
 
