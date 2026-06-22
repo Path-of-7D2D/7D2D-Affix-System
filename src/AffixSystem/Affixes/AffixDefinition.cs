@@ -5,6 +5,7 @@ namespace AffixSystem.Affixes
     internal sealed class AffixDefinition
     {
         private readonly FastTags<TagGroup.Global>[] requiredAnyTags;
+        private readonly string[] requiredAnyTagExpressions;
 
         public AffixDefinition(
             string id,
@@ -19,6 +20,7 @@ namespace AffixSystem.Affixes
             PassiveEffect = passiveEffect;
             StatLabel = statLabel;
             TierStatValues = tierStatValues;
+            this.requiredAnyTagExpressions = requiredAnyTagExpressions;
             requiredAnyTags = new FastTags<TagGroup.Global>[requiredAnyTagExpressions.Length];
 
             for (int i = 0; i < requiredAnyTagExpressions.Length; i++)
@@ -36,6 +38,16 @@ namespace AffixSystem.Affixes
         public string StatLabel { get; }
 
         public int[] TierStatValues { get; }
+
+        public string RequirementSummary
+        {
+            get
+            {
+                return requiredAnyTagExpressions.Length == 0
+                    ? "any supported weapon"
+                    : string.Join(" | ", requiredAnyTagExpressions);
+            }
+        }
 
         public bool IsAllowedOn(ItemClass itemClass)
         {

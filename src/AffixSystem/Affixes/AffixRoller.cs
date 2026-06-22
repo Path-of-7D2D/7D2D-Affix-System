@@ -15,7 +15,7 @@ namespace AffixSystem.Affixes
         {
             affixCount = Math.Max(1, affixCount);
             int maxTier = Math.Max(1, Math.Min(6, (int)itemValue.Quality));
-            List<AffixDefinition> legal = GetLegalAffixes(itemValue, null);
+            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue);
 
             var affixes = new List<AffixInstance>();
             while (affixes.Count < affixCount && legal.Count > 0)
@@ -35,7 +35,7 @@ namespace AffixSystem.Affixes
         {
             affix = null;
             int maxTier = Math.Max(1, Math.Min(6, (int)itemValue.Quality));
-            List<AffixDefinition> legal = GetLegalAffixes(itemValue, existingAffixes);
+            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue, existingAffixes);
             if (legal.Count == 0)
             {
                 return false;
@@ -47,45 +47,5 @@ namespace AffixSystem.Affixes
             return true;
         }
 
-        private static List<AffixDefinition> GetLegalAffixes(ItemValue itemValue, IReadOnlyList<AffixInstance> existingAffixes)
-        {
-            var legal = new List<AffixDefinition>();
-
-            for (int i = 0; i < AffixCatalog.All.Count; i++)
-            {
-                AffixDefinition definition = AffixCatalog.All[i];
-                if (!definition.IsAllowedOn(itemValue.ItemClass))
-                {
-                    continue;
-                }
-
-                if (HasExistingAffix(existingAffixes, definition.Id))
-                {
-                    continue;
-                }
-
-                legal.Add(definition);
-            }
-
-            return legal;
-        }
-
-        private static bool HasExistingAffix(IReadOnlyList<AffixInstance> existingAffixes, string definitionId)
-        {
-            if (existingAffixes == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < existingAffixes.Count; i++)
-            {
-                if (existingAffixes[i].DefinitionId == definitionId)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }
