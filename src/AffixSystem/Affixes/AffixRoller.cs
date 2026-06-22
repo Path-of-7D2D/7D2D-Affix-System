@@ -15,17 +15,17 @@ namespace AffixSystem.Affixes
         {
             affixCount = Math.Max(1, affixCount);
             int maxTier = Math.Max(1, Math.Min(6, (int)itemValue.Quality));
-            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue);
 
             var affixes = new List<AffixInstance>();
+            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue, affixes);
             while (affixes.Count < affixCount && legal.Count > 0)
             {
                 int index = random.Next(legal.Count);
                 AffixDefinition definition = legal[index];
-                legal.RemoveAt(index);
 
                 int tier = random.Next(1, maxTier + 1);
                 affixes.Add(new AffixInstance(definition.Id, tier, definition.GetStatValueForTier(tier)));
+                legal = AffixCatalog.GetLegalAffixes(itemValue, affixes);
             }
 
             return new AffixItemState(rarity, affixes);
