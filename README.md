@@ -23,6 +23,8 @@ or Rare item.
   stamina cost, durability, motor tools, and lower-value entity damage.
 - Adds the first armor-specific affix pool for health, stamina, movement,
   stealth, resistances, carry capacity, and conservative global damage.
+- Prevents duplicate affix families on a single item during natural rolls and
+  augment rolls.
 
 ## Install
 
@@ -107,7 +109,8 @@ up to 3. Generated Rare items roll 4 affixes and can be augmented up to 6.
 
 Use `affix list held` or `affix validate` to inspect which affixes can still
 roll on the held item. Use `affix validate <itemName> <quality>` to inspect a
-specific base item without spawning it.
+specific base item without spawning it. `affix list all` also shows each
+affix's duplicate-prevention family.
 
 ## Tuning
 

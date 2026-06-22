@@ -53,5 +53,8 @@ Build properties match the other local Path-of-7D2D modlets:
   Affixes tab renders armor affixes and boosted armor stat numbers.
 - Run `affix currency 2`, hold the affixed armor item, then use `Affix Augment`
   from inventory.
+- Run `affix list all` and confirm each affix reports a family.
+- After natural rolls and augments, run `affix inspect` and confirm the item
+  does not contain two affixes from the same family.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
   supported generated weapons, tools, and armor roll Magic or Rare affixes.

@@ -14,9 +14,22 @@ namespace AffixSystem.Affixes
             string statLabel,
             int[] tierStatValues,
             params string[] requiredAnyTagExpressions)
+            : this(id, displayName, passiveEffect.ToString(), passiveEffect, statLabel, tierStatValues, requiredAnyTagExpressions)
+        {
+        }
+
+        public AffixDefinition(
+            string id,
+            string displayName,
+            string family,
+            PassiveEffects passiveEffect,
+            string statLabel,
+            int[] tierStatValues,
+            params string[] requiredAnyTagExpressions)
         {
             Id = id;
             DisplayName = displayName;
+            Family = string.IsNullOrEmpty(family) ? passiveEffect.ToString() : family;
             PassiveEffect = passiveEffect;
             StatLabel = statLabel;
             TierStatValues = tierStatValues;
@@ -32,6 +45,8 @@ namespace AffixSystem.Affixes
         public string Id { get; }
 
         public string DisplayName { get; }
+
+        public string Family { get; }
 
         public PassiveEffects PassiveEffect { get; }
 

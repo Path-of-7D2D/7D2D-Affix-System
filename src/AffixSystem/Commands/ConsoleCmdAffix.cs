@@ -300,7 +300,7 @@ namespace AffixSystem.Commands
             for (int i = 0; i < AffixCatalog.All.Count; i++)
             {
                 AffixDefinition definition = AffixCatalog.All[i];
-                Output(definition.Id + " - " + definition.DisplayName + " (" + definition.StatLabel + "), allowed: " + definition.RequirementSummary);
+                Output(definition.Id + " - " + definition.DisplayName + " (" + definition.StatLabel + ", family " + definition.Family + "), allowed: " + definition.RequirementSummary);
             }
         }
 

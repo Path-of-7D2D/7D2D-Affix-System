@@ -70,7 +70,7 @@ namespace AffixSystem.Affixes
                     continue;
                 }
 
-                if (HasExistingAffix(existingAffixes, definition.Id))
+                if (HasExistingAffixInFamily(existingAffixes, definition))
                 {
                     continue;
                 }
@@ -97,7 +97,7 @@ namespace AffixSystem.Affixes
             return result;
         }
 
-        private static bool HasExistingAffix(IReadOnlyList<AffixInstance> existingAffixes, string definitionId)
+        private static bool HasExistingAffixInFamily(IReadOnlyList<AffixInstance> existingAffixes, AffixDefinition candidate)
         {
             if (existingAffixes == null)
             {
@@ -106,7 +106,17 @@ namespace AffixSystem.Affixes
 
             for (int i = 0; i < existingAffixes.Count; i++)
             {
-                if (existingAffixes[i].DefinitionId == definitionId)
+                if (existingAffixes[i].DefinitionId == candidate.Id)
+                {
+                    return true;
+                }
+
+                if (!TryGet(existingAffixes[i].DefinitionId, out AffixDefinition existingDefinition))
+                {
+                    continue;
+                }
+
+                if (existingDefinition.Family.Equals(candidate.Family, System.StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
