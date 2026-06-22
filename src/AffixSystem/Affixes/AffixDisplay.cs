@@ -8,6 +8,15 @@ namespace AffixSystem.Affixes
         private const string RareColor = "FFD166";
         private const string MutedColor = "B8C1CC";
         private const string ValueColor = "8EF6D2";
+        private static readonly string[] TierColors =
+        {
+            "B8C1CC",
+            "72D572",
+            "5DB7FF",
+            "C77DFF",
+            "FFB84D",
+            "FF5D73"
+        };
 
         public static string BuildItemName(string baseName, AffixItemState state)
         {
@@ -23,19 +32,17 @@ namespace AffixSystem.Affixes
             return $"[{color}]{rarity}[-] {baseName}";
         }
 
-        public static string AppendDescription(string baseDescription, AffixItemState state)
+        public static string BuildAffixHeader(AffixItemState state)
         {
-            var builder = new StringBuilder(baseDescription ?? string.Empty);
             string color = state.Rarity == AffixRarity.Rare ? RareColor : MagicColor;
             string rarity = state.Rarity == AffixRarity.Rare ? "Rare" : "Magic";
 
-            if (builder.Length > 0)
-            {
-                builder.Append("\n\n");
-            }
+            return "[" + color + "]" + rarity + " Affixes[-] [" + MutedColor + "](" + state.Affixes.Count + ")[-]";
+        }
 
-            builder.Append('[').Append(color).Append(']').Append(rarity).Append(" Affixes[-]\n");
-
+        public static string BuildAffixDetails(AffixItemState state)
+        {
+            var builder = new StringBuilder();
             for (int i = 0; i < state.Affixes.Count; i++)
             {
                 AffixInstance affix = state.Affixes[i];
@@ -45,9 +52,9 @@ namespace AffixSystem.Affixes
                 }
 
                 builder
-                    .Append('[').Append(MutedColor).Append("]T").Append(affix.Tier).Append("[-] ")
-                    .Append(definition.DisplayName)
-                    .Append(": [").Append(ValueColor).Append(']')
+                    .Append('[').Append(GetTierColor(affix.Tier)).Append("]T").Append(affix.Tier).Append("[-] ")
+                    .Append("[FFFFFF]").Append(definition.DisplayName).Append("[-]  ")
+                    .Append("[").Append(ValueColor).Append(']')
                     .Append(definition.FormatValue(affix.StatValue))
                     .Append("[-]\n");
             }
@@ -84,6 +91,20 @@ namespace AffixSystem.Affixes
 
             return builder.ToString();
         }
+
+        private static string GetTierColor(int tier)
+        {
+            int index = tier - 1;
+            if (index < 0)
+            {
+                index = 0;
+            }
+            else if (index >= TierColors.Length)
+            {
+                index = TierColors.Length - 1;
+            }
+
+            return TierColors[index];
+        }
     }
 }
-

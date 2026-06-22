@@ -12,8 +12,8 @@ hooked up.
 - Adds a cheat command for spawning Magic or Rare weapons.
 - Stores affix state on the item instance.
 - Applies affix values through `ItemValue` stat boosts.
-- Shows affix rarity, affix names, tiers, and rolled values in the item info
-  panel.
+- Adds a star Affixes tab next to Stats and Description in the item info panel.
+- Shows affix rarity, affix names, tier colors, and rolled values in that tab.
 
 ## Install
 
@@ -23,7 +23,8 @@ Build the project:
 dotnet build src/AffixSystem/AffixSystem.csproj -c Release
 ```
 
-The build copies `AffixSystem.dll` into `1A-AffixSystem/`.
+The build copies `AffixSystem.dll` and XUi config patches into
+`1A-AffixSystem/`.
 
 If the game is installed at the default Steam path, the build also refreshes the
 live game install:
@@ -41,6 +42,9 @@ Open the F1 console in a world and run:
 ```text
 affixspawn rare
 ```
+
+Open the item info panel for the spawned weapon and click the star icon beside
+Stats and Description to inspect rolled affixes.
 
 Usage:
 

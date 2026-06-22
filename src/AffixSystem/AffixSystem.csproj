@@ -51,9 +51,16 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ModConfigFiles Include="$(MSBuildProjectDirectory)\Config\**\*.*" />
+  </ItemGroup>
+
   <Target Name="DeployToModFolder" AfterTargets="Build">
     <MakeDir Directories="$(ModDeployDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDeployDir)" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(ModConfigFiles)"
+          DestinationFiles="@(ModConfigFiles->'$(ModDeployDir)\Config\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
     <Message Importance="high" Text="Deployed $(TargetFileName) -&gt; $(ModDeployDir)" />
   </Target>
 
@@ -65,8 +72,10 @@
     <MakeDir Directories="$(GameModDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameModDir)" SkipUnchangedFiles="false" />
     <Copy SourceFiles="$(ModDeployDir)\ModInfo.xml" DestinationFolder="$(GameModDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ModConfigFiles)"
+          DestinationFiles="@(ModConfigFiles->'$(GameModDir)\Config\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
     <Message Importance="high" Text="Installed to game: $(GameModDir)" />
   </Target>
 
 </Project>
-

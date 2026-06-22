@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Adds a dedicated Affixes tab to the vanilla item info panel. -->
+<configs>
+
+	<append xpath="/windows/window[@name='itemInfoPanel']/rect[@name='contentInfo']/rect[@name='searchControls']">
+		<button depth="4" name="affixButton" style="icon30px, press" pos="108,-22" sprite="ui_game_symbol_star" pivot="center" tooltip="Affixes" sound="[paging_click]" visible="{hasaffixes}" />
+	</append>
+
+	<append xpath="/windows/window[@name='itemInfoPanel']/rect[@name='contentInfo']/rect[@name='description'][@height='228']">
+		<rect depth="3" visible="{showaffixes}" width="453">
+			<sprite depth="1" color="[darkGrey]" type="sliced" />
+			<label depth="3" pos="8,-6" width="431" height="28" text="{affixheader}" font_size="26" justify="left" />
+			<label depth="3" pos="8,-39" width="431" height="178" text="{affixdescription}" font_size="24" justify="left" parse_actions="true" />
+		</rect>
+	</append>
+
+</configs>
