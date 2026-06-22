@@ -48,7 +48,7 @@ namespace AffixSystem.Commands
 
             if (subcommand.Equals("inspect", StringComparison.OrdinalIgnoreCase))
             {
-                InspectHeldItem();
+                InspectHeldItem(_params);
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace AffixSystem.Commands
             return getDescription() + "\n" +
                 "Subcommands:\n" +
                 "  affix spawn <magic|rare> [itemName=" + DefaultItem + "] [quality=6] [drop=false]\n" +
-                "  affix inspect\n" +
+                "  affix inspect [raw]\n" +
                 "  affix currency [count=1]\n" +
                 "  affix augment\n" +
                 "  affix list [all|held]\n" +
@@ -132,6 +132,7 @@ namespace AffixSystem.Commands
                 "  affix spawn rare armorPrimitiveHelmet 6\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6 true\n" +
                 "  affix inspect\n" +
+                "  affix inspect raw\n" +
                 "  affix currency 3\n" +
                 "  affix augment\n" +
                 "  affix list held\n" +
@@ -270,7 +271,7 @@ namespace AffixSystem.Commands
             Output(AffixDisplay.BuildSummary(newState));
         }
 
-        private static void InspectHeldItem()
+        private static void InspectHeldItem(List<string> parameters)
         {
             EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
             if (player == null)
@@ -294,10 +295,19 @@ namespace AffixSystem.Commands
             if (!AffixEligibility.TryGetDisplayableState(itemValue, out AffixItemState state))
             {
                 Output("No Magic or Rare affixes are stored on this item.");
+                if (IsRawInspect(parameters))
+                {
+                    OutputRawItemMetadata(itemValue, null);
+                }
+
                 return;
             }
 
             Output(AffixDisplay.BuildSummary(state));
+            if (IsRawInspect(parameters))
+            {
+                OutputRawItemMetadata(itemValue, state);
+            }
         }
 
         private static void ListAffixes(List<string> parameters)
@@ -544,6 +554,32 @@ namespace AffixSystem.Commands
 
             enabled = false;
             return false;
+        }
+
+        private static bool IsRawInspect(List<string> parameters)
+        {
+            return parameters.Count > 1 &&
+                (parameters[1].Equals("raw", StringComparison.OrdinalIgnoreCase) ||
+                    parameters[1].Equals("metadata", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static void OutputRawItemMetadata(ItemValue itemValue, AffixItemState state)
+        {
+            string raw = itemValue.TryGetMetadata(AffixItemState.MetadataKey, out string metadata) && !string.IsNullOrEmpty(metadata)
+                ? metadata
+                : "none";
+
+            Output("Raw item: type " + itemValue.type + ", quality " + itemValue.Quality + ", seed " + itemValue.Seed);
+            Output("Raw affix metadata: " + raw);
+
+            if (state == null)
+            {
+                return;
+            }
+
+            int cap = AffixTuning.GetAffixCap(state.Rarity);
+            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue, state.Affixes);
+            Output("Stored state: " + state.Rarity + ", affixes " + state.Affixes.Count + "/" + cap + ", legal remaining " + legal.Count);
         }
 
         private static bool TryParseRarity(string raw, out AffixRarity rarity)

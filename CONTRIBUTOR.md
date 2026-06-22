@@ -60,6 +60,11 @@ Build properties match the other local Path-of-7D2D modlets:
 - Run `affix list all` and confirm each affix reports a family.
 - After natural rolls and augments, run `affix inspect` and confirm the item
   does not contain two affixes from the same family.
+- Run `affix inspect raw`, record the raw metadata, move the item between
+  toolbelt/backpack/container, drop and pick it back up, then confirm
+  `affix inspect raw` reports the same affix metadata.
+- After a world reload, hold the same item and confirm `affix inspect raw` still
+  reports the same metadata and affix count.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
   supported generated weapons, tools, and armor roll Magic or Rare affixes.
 - Run `affix debug rarity container:hardenedChestT5` and confirm it reports a

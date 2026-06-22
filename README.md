@@ -68,7 +68,7 @@ Usage:
 
 ```text
 affix spawn <magic|rare> [itemName=gunHandgunT1Pistol] [quality=6] [drop=false]
-affix inspect
+affix inspect [raw]
 affix currency [count=1]
 affix augment
 affix list [all|held]
@@ -85,6 +85,10 @@ Inspect the currently held toolbelt item:
 affix inspect
 ```
 
+Use `affix inspect raw` when testing persistence. It prints the item type,
+quality, seed, raw affix metadata, stored rarity/count, cap, and legal remaining
+affix count for the held item.
+
 Examples:
 
 ```text
@@ -97,6 +101,7 @@ affix spawn rare armorPrimitiveHelmet 6
 affix spawn rare armorMinerOutfit 6
 affix spawn rare gunHandgunT1Pistol 6 true
 affix inspect
+affix inspect raw
 affix currency 3
 affix augment
 affix list held
