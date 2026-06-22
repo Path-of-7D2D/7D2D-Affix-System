@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+  <!-- Affix Augment should be found through risky loot paths, not normal trader stock. -->
+  <append xpath="/lootcontainers/lootgroup[@name='groupSmallWeaponBag']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupLargeWeaponBag']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
+  </append>
+
+  <append xpath="/lootcontainers/lootgroup[@name='groupToolbox']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupRollingToolbox']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootcontainer[@name='armorRack']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow"/>
+  </append>
+
+  <append xpath="/lootcontainers/lootgroup[@name='groupReinforcedChestT2']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupReinforcedChestT3']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupHardenedChestT4']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupHardenedChestT5']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="medLow" force_prob="true"/>
+  </append>
+
+  <append xpath="/lootcontainers/lootgroup[@name='groupInfestedT3']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupInfestedT4']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupInfestedT5']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
+  </append>
+
+  <append xpath="/lootcontainers/lootgroup[@name='groupZpackReg']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupZpackStrong']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupZpackBoss']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupZpackPlague']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
+  </append>
+</configs>

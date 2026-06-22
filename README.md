@@ -25,6 +25,9 @@ or Rare item.
   stealth, resistances, carry capacity, and conservative global damage.
 - Prevents duplicate affix families on a single item during natural rolls and
   augment rolls.
+- Adds controlled `Affix Augment` drops to high-value found loot such as weapon
+  bags, toolboxes, armor racks, reinforced/hardened chests, infestation loot,
+  and zombie loot bags.
 
 ## Install
 
@@ -127,6 +130,15 @@ After editing the file in a running world, use:
 ```text
 affix reload
 ```
+
+Currency acquisition is patched through:
+
+```text
+Config/loot.xml
+```
+
+That file controls where `Affix Augment` can appear in loot. It intentionally
+does not add normal trader stock.
 
 ## License
 
