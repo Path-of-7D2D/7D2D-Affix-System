@@ -9,6 +9,11 @@
       <property name="EconomicValue" value="250"/>
       <property name="Group" value="Resources"/>
       <property name="CreativeMode" value="Player"/>
+      <property class="Action0">
+        <property name="Class" value="AffixAugment"/>
+        <property name="Delay" value="0"/>
+        <property name="Description" value="lblAffixAugmentUse"/>
+      </property>
     </item>
   </append>
 </configs>
