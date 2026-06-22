@@ -81,3 +81,6 @@ Build properties match the other local Path-of-7D2D modlets:
 - Open high-value loot such as weapon bags, toolboxes, armor racks,
   reinforced/hardened chests, infestation rewards, or zombie loot bags and
   confirm `Affix Augment` can appear without being sold as normal trader stock.
+- Complete several weapon/tool/armor quest reward rolls and confirm `Affix
+  Augment` can appear as a rare reward candidate without becoming normal trader
+  stock.

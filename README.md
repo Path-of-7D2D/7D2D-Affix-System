@@ -37,7 +37,7 @@ or Rare item.
   augment rolls.
 - Adds controlled `Affix Augment` drops to high-value found loot such as weapon
   bags, toolboxes, armor racks, reinforced/hardened chests, infestation loot,
-  and zombie loot bags.
+  zombie loot bags, and low-probability weapon/tool/armor quest reward pools.
 
 ## Install
 

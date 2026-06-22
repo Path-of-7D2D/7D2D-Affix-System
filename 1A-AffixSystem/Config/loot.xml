@@ -41,6 +41,16 @@
     <item name="resourceAffixAugment" count="1" loot_prob_template="low" force_prob="true"/>
   </append>
 
+  <append xpath="/lootcontainers/lootgroup[@name='groupQuestWeapons']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupQuestTools']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupQuestArmor']">
+    <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow"/>
+  </append>
+
   <append xpath="/lootcontainers/lootgroup[@name='groupZpackReg']">
     <item name="resourceAffixAugment" count="1" loot_prob_template="veryLow" force_prob="true"/>
   </append>
