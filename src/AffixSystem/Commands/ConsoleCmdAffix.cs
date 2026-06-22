@@ -179,7 +179,7 @@ namespace AffixSystem.Commands
 
             var random = new System.Random(unchecked(Environment.TickCount ^ itemValue.Seed ^ (int)DateTime.UtcNow.Ticks));
             int affixCount = AffixTuning.GetNaturalAffixCount(rarity, quality, random);
-            AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount);
+            AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount, "command:spawn");
             if (state.Affixes.Count == 0)
             {
                 Output("No legal affixes were available for " + itemName + ".");
@@ -579,7 +579,7 @@ namespace AffixSystem.Commands
 
             int cap = AffixTuning.GetAffixCap(state.Rarity);
             List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(itemValue, state.Affixes);
-            Output("Stored state: " + state.Rarity + ", affixes " + state.Affixes.Count + "/" + cap + ", legal remaining " + legal.Count);
+            Output("Stored state: " + state.Rarity + ", affixes " + state.Affixes.Count + "/" + cap + ", legal remaining " + legal.Count + ", origin " + (string.IsNullOrEmpty(state.Origin) ? "unknown" : state.Origin));
         }
 
         private static bool TryParseRarity(string raw, out AffixRarity rarity)

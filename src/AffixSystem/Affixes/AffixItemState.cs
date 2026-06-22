@@ -9,14 +9,22 @@ namespace AffixSystem.Affixes
         public const string MetadataKey = "p7d2d.affixes.v1";
 
         public AffixItemState(AffixRarity rarity, IReadOnlyList<AffixInstance> affixes)
+            : this(rarity, affixes, null)
+        {
+        }
+
+        public AffixItemState(AffixRarity rarity, IReadOnlyList<AffixInstance> affixes, string origin)
         {
             Rarity = rarity;
             Affixes = affixes;
+            Origin = string.IsNullOrEmpty(origin) ? null : origin;
         }
 
         public AffixRarity Rarity { get; }
 
         public IReadOnlyList<AffixInstance> Affixes { get; }
+
+        public string Origin { get; }
 
         public bool IsDisplayable => Rarity == AffixRarity.Magic || Rarity == AffixRarity.Rare;
 
@@ -29,20 +37,15 @@ namespace AffixSystem.Affixes
             }
 
             string[] parts = raw.Split('|');
-            if (parts.Length != 3 || parts[0] != "1")
-            {
-                return false;
-            }
-
-            if (!Enum.TryParse(parts[1], ignoreCase: true, out AffixRarity rarity))
+            if (!TryReadParts(parts, out AffixRarity rarity, out string origin, out string affixPart))
             {
                 return false;
             }
 
             var affixes = new List<AffixInstance>();
-            if (!string.IsNullOrEmpty(parts[2]))
+            if (!string.IsNullOrEmpty(affixPart))
             {
-                string[] entries = parts[2].Split(';');
+                string[] entries = affixPart.Split(';');
                 for (int i = 0; i < entries.Length; i++)
                 {
                     string[] entry = entries[i].Split(',');
@@ -75,7 +78,7 @@ namespace AffixSystem.Affixes
                 return false;
             }
 
-            state = new AffixItemState(rarity, affixes);
+            state = new AffixItemState(rarity, affixes, origin);
             return true;
         }
 
@@ -107,7 +110,46 @@ namespace AffixSystem.Affixes
                     affix.StatValue.ToString(CultureInfo.InvariantCulture));
             }
 
-            return "1|" + Rarity + "|" + string.Join(";", entries.ToArray());
+            return "2|" + Rarity + "|" + SanitizeMetadataValue(Origin) + "|" + string.Join(";", entries.ToArray());
+        }
+
+        private static bool TryReadParts(string[] parts, out AffixRarity rarity, out string origin, out string affixPart)
+        {
+            rarity = AffixRarity.Magic;
+            origin = null;
+            affixPart = null;
+
+            if (parts.Length == 3 && parts[0] == "1")
+            {
+                if (!Enum.TryParse(parts[1], ignoreCase: true, out rarity))
+                {
+                    return false;
+                }
+
+                affixPart = parts[2];
+                return true;
+            }
+
+            if (parts.Length == 4 && parts[0] == "2")
+            {
+                if (!Enum.TryParse(parts[1], ignoreCase: true, out rarity))
+                {
+                    return false;
+                }
+
+                origin = string.IsNullOrEmpty(parts[2]) ? null : parts[2];
+                affixPart = parts[3];
+                return true;
+            }
+
+            return false;
+        }
+
+        private static string SanitizeMetadataValue(string value)
+        {
+            return string.IsNullOrEmpty(value)
+                ? ""
+                : value.Replace("|", "/");
         }
     }
 }

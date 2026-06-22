@@ -45,7 +45,7 @@ namespace AffixSystem.Loot
 
                 AffixRarity rarity = AffixTuning.ChooseLootRarity(random, source);
                 int affixCount = AffixTuning.GetNaturalAffixCount(rarity, (int)itemValue.Quality, random);
-                AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount);
+                AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount, source);
                 if (state.Affixes.Count == 0)
                 {
                     AffixTuning.LogLoot(source + "[" + i + "]: no legal affixes for " + GetItemName(itemValue) + ".");

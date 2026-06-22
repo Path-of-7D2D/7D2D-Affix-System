@@ -13,6 +13,8 @@ or Rare item.
 - Rolls Magic or Rare affixes onto newly generated loot container and loot bag
   weapons, tools, and armor.
 - Stores affix state on the item instance.
+- Records the affix roll origin on newly written affix metadata for debugging
+  found-loot versus command-spawned items.
 - Applies affix values through `ItemValue` stat boosts.
 - Adds a star Affixes tab next to Stats and Description in the item info panel.
 - Shows affix rarity, affix names, tier colors, and rolled values in that tab.
@@ -90,8 +92,8 @@ affix inspect
 ```
 
 Use `affix inspect raw` when testing persistence. It prints the item type,
-quality, seed, raw affix metadata, stored rarity/count, cap, and legal remaining
-affix count for the held item.
+quality, seed, raw affix metadata, stored rarity/count, cap, legal remaining
+affix count, and metadata origin for the held item.
 
 Examples:
 

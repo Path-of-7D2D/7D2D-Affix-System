@@ -38,7 +38,7 @@ namespace AffixSystem.Affixes
             var affixes = new List<AffixInstance>(currentState.Affixes);
             affixes.Add(addedAffix);
 
-            newState = new AffixItemState(currentState.Rarity, affixes);
+            newState = new AffixItemState(currentState.Rarity, affixes, currentState.Origin);
             newState.WriteTo(itemValue);
 
             message = "Added " + FormatAddedAffix(addedAffix) + " Affixes: " + newState.Affixes.Count + "/" + cap + ".";

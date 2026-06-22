@@ -11,7 +11,7 @@ namespace AffixSystem.Affixes
             return Roll(itemValue, rarity, random, affixCount);
         }
 
-        public static AffixItemState Roll(ItemValue itemValue, AffixRarity rarity, Random random, int affixCount)
+        public static AffixItemState Roll(ItemValue itemValue, AffixRarity rarity, Random random, int affixCount, string origin = null)
         {
             affixCount = Math.Max(1, affixCount);
             int maxTier = Math.Max(1, Math.Min(6, (int)itemValue.Quality));
@@ -28,7 +28,7 @@ namespace AffixSystem.Affixes
                 legal = AffixCatalog.GetLegalAffixes(itemValue, affixes);
             }
 
-            return new AffixItemState(rarity, affixes);
+            return new AffixItemState(rarity, affixes, origin);
         }
 
         public static bool TryRollAdditional(ItemValue itemValue, IReadOnlyList<AffixInstance> existingAffixes, Random random, out AffixInstance affix)
