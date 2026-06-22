@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AffixSystem.Affixes;
+using AffixSystem.Config;
 using Platform;
 using UnityEngine;
 using UnityEngine.Scripting;
@@ -49,6 +50,19 @@ namespace AffixSystem.Commands
                 return;
             }
 
+            if (subcommand.Equals("debug", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug(_params);
+                return;
+            }
+
+            if (subcommand.Equals("reload", StringComparison.OrdinalIgnoreCase))
+            {
+                AffixTuning.Reload();
+                Output("Reloaded affix tuning config.");
+                return;
+            }
+
             if (subcommand.Equals("help", StringComparison.OrdinalIgnoreCase))
             {
                 Output(getHelp());
@@ -61,7 +75,7 @@ namespace AffixSystem.Commands
 
         public override string getDescription()
         {
-            return "usage: affix <spawn|inspect|help>";
+            return "usage: affix <spawn|inspect|debug|reload|help>";
         }
 
         public override string getHelp()
@@ -70,12 +84,15 @@ namespace AffixSystem.Commands
                 "Subcommands:\n" +
                 "  affix spawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]\n" +
                 "  affix inspect\n" +
+                "  affix debug loot <on|off>\n" +
+                "  affix reload\n" +
                 "Examples:\n" +
                 "  affix spawn magic\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6\n" +
                 "  affix spawn rare meleeWpnBladeT1HuntingKnife 5\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6 true\n" +
-                "  affix inspect";
+                "  affix inspect\n" +
+                "  affix debug loot on";
         }
 
         private static void Spawn(List<string> parameters)
@@ -164,6 +181,46 @@ namespace AffixSystem.Commands
             }
 
             Output(AffixDisplay.BuildSummary(state));
+        }
+
+        private static void Debug(List<string> parameters)
+        {
+            if (parameters.Count < 3 || !parameters[1].Equals("loot", StringComparison.OrdinalIgnoreCase))
+            {
+                Output("usage: affix debug loot <on|off>");
+                return;
+            }
+
+            if (TryParseToggle(parameters[2], out bool enabled))
+            {
+                AffixTuning.SetLootDebugLogging(enabled);
+                Output("Loot debug logging " + (enabled ? "enabled." : "disabled."));
+                return;
+            }
+
+            Output("usage: affix debug loot <on|off>");
+        }
+
+        private static bool TryParseToggle(string raw, out bool enabled)
+        {
+            if (raw.Equals("on", StringComparison.OrdinalIgnoreCase) ||
+                raw.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                raw.Equals("1", StringComparison.OrdinalIgnoreCase))
+            {
+                enabled = true;
+                return true;
+            }
+
+            if (raw.Equals("off", StringComparison.OrdinalIgnoreCase) ||
+                raw.Equals("false", StringComparison.OrdinalIgnoreCase) ||
+                raw.Equals("0", StringComparison.OrdinalIgnoreCase))
+            {
+                enabled = false;
+                return true;
+            }
+
+            enabled = false;
+            return false;
         }
 
         private static bool TryParseRarity(string raw, out AffixRarity rarity)

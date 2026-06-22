@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<affixTuning>
+  <loot>
+    <enabled>true</enabled>
+    <debugLogging>false</debugLogging>
+    <rarityWeights>
+      <magic>75</magic>
+      <rare>25</rare>
+    </rarityWeights>
+  </loot>
+  <affixCaps>
+    <magic>2</magic>
+    <rare>4</rare>
+  </affixCaps>
+  <currency>
+    <augmentItemName>resourceAffixAugment</augmentItemName>
+  </currency>
+</affixTuning>

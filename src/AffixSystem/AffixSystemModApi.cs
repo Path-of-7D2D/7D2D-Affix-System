@@ -1,4 +1,5 @@
 using System.Reflection;
+using AffixSystem.Config;
 using HarmonyLib;
 
 namespace AffixSystem
@@ -9,6 +10,8 @@ namespace AffixSystem
         {
             const string id = "com.pathof7d2d.affixsystem";
             Log.Out("[AffixSystem] InitMod running...");
+
+            AffixTuning.Load(_modInstance);
 
             var harmony = new Harmony(id);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
