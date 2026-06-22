@@ -31,8 +31,8 @@ Build properties match the other local Path-of-7D2D modlets:
 - Load a world.
 - Run `affix spawn rare`.
 - Confirm the item appears in the backpack or drops at the player.
-- Confirm the item info panel shows rarity, affix tier lines, and boosted stat
-  numbers.
+- Confirm the item info panel shows a Rare item name with an affix-derived
+  prefix/suffix, affix tier lines, and boosted stat numbers.
 - Run `affix currency 2`, hold the affixed item in the toolbelt, then run
   `affix augment`.
 - Confirm the currency count decreases and the Affixes tab shows one additional

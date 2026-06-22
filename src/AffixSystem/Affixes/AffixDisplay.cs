@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 
 namespace AffixSystem.Affixes
@@ -17,6 +18,7 @@ namespace AffixSystem.Affixes
             "FFB84D",
             "FF5D73"
         };
+        private static readonly Dictionary<string, string> RareSuffixes = BuildRareSuffixes();
 
         public static string BuildItemName(string baseName, AffixItemState state)
         {
@@ -27,6 +29,22 @@ namespace AffixSystem.Affixes
                 AffixCatalog.TryGet(state.Affixes[0].DefinitionId, out AffixDefinition first))
             {
                 return $"[{color}]{rarity}[-] {first.DisplayName} {baseName}";
+            }
+
+            if (state.Rarity == AffixRarity.Rare)
+            {
+                string prefix = GetAffixDisplayName(state, 0);
+                string suffix = GetRareSuffix(state, 1);
+
+                if (!string.IsNullOrEmpty(prefix) && !string.IsNullOrEmpty(suffix))
+                {
+                    return $"[{color}]{rarity}[-] {prefix} {baseName} of {suffix}";
+                }
+
+                if (!string.IsNullOrEmpty(prefix))
+                {
+                    return $"[{color}]{rarity}[-] {prefix} {baseName}";
+                }
             }
 
             return $"[{color}]{rarity}[-] {baseName}";
@@ -111,6 +129,76 @@ namespace AffixSystem.Affixes
             }
 
             return TierColors[index];
+        }
+
+        private static string GetAffixDisplayName(AffixItemState state, int index)
+        {
+            if (state == null || index < 0 || index >= state.Affixes.Count)
+            {
+                return null;
+            }
+
+            return AffixCatalog.TryGet(state.Affixes[index].DefinitionId, out AffixDefinition definition)
+                ? definition.DisplayName
+                : null;
+        }
+
+        private static string GetRareSuffix(AffixItemState state, int startIndex)
+        {
+            if (state == null)
+            {
+                return null;
+            }
+
+            for (int i = startIndex; i < state.Affixes.Count; i++)
+            {
+                string id = state.Affixes[i].DefinitionId;
+                if (RareSuffixes.TryGetValue(id, out string suffix))
+                {
+                    return suffix;
+                }
+
+                if (AffixCatalog.TryGet(id, out AffixDefinition definition))
+                {
+                    return definition.DisplayName;
+                }
+            }
+
+            return null;
+        }
+
+        private static Dictionary<string, string> BuildRareSuffixes()
+        {
+            return new Dictionary<string, string>
+            {
+                { "sharpened", "Slaughter" },
+                { "crusher", "Ruin" },
+                { "reinforced", "Endurance" },
+                { "expanded", "Capacity" },
+                { "rapid", "Haste" },
+                { "farshot", "Distance" },
+                { "ranging", "Reach" },
+                { "ballistic", "Velocity" },
+                { "quickdraw", "Reloading" },
+                { "balanced", "Control" },
+                { "executioner", "Execution" },
+                { "frenzied", "Fury" },
+                { "efficient", "Efficiency" },
+                { "quarrying", "Quarrying" },
+                { "bountiful", "Plenty" },
+                { "braced", "Fortitude" },
+                { "workhorse", "Industry" },
+                { "gravebreaker", "Gravebreaking" },
+                { "vital", "Vigor" },
+                { "enduring", "Stamina" },
+                { "quickstep", "Pace" },
+                { "silent", "Silence" },
+                { "insulated", "Shelter" },
+                { "hardy", "Resilience" },
+                { "packrat", "Burden" },
+                { "specialist", "Focus" },
+                { "wastelandHardened", "Survival" }
+            };
         }
     }
 }

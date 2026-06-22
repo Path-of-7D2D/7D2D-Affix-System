@@ -16,6 +16,8 @@ or Rare item.
 - Applies affix values through `ItemValue` stat boosts.
 - Adds a star Affixes tab next to Stats and Description in the item info panel.
 - Shows affix rarity, affix names, tier colors, and rolled values in that tab.
+- Displays Magic item names with their leading affix and Rare item names with
+  affix-derived prefix/suffix identity.
 - Adds a prototype `Affix Augment` currency item with an inventory use action.
 - Keeps weapon affix pools scoped by item category so melee-only and gun-only
   stats do not roll on the wrong weapon type.
