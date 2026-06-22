@@ -25,6 +25,8 @@ or Rare item.
   stamina cost, durability, motor tools, and lower-value entity damage.
 - Adds the first armor-specific affix pool for health, stamina, movement,
   stealth, resistances, carry capacity, and conservative global damage.
+- Applies per-affix quality gates so higher-power affix families start appearing
+  on better item bases.
 - Prevents duplicate affix families on a single item during natural rolls and
   augment rolls.
 - Adds controlled `Affix Augment` drops to high-value found loot such as weapon
@@ -120,7 +122,7 @@ quality and can be augmented up to 6.
 Use `affix list held` or `affix validate` to inspect which affixes can still
 roll on the held item. Use `affix validate <itemName> <quality>` to inspect a
 specific base item without spawning it. `affix list all` also shows each
-affix's duplicate-prevention family.
+affix's duplicate-prevention family and quality gate.
 
 Use `affix rolltest <itemName> <quality> <samples> [source]` to simulate
 natural loot rolls without creating items. The output reports effective

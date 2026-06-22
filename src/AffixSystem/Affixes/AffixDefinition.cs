@@ -14,7 +14,7 @@ namespace AffixSystem.Affixes
             string statLabel,
             int[] tierStatValues,
             params string[] requiredAnyTagExpressions)
-            : this(id, displayName, passiveEffect.ToString(), passiveEffect, statLabel, tierStatValues, requiredAnyTagExpressions)
+            : this(id, displayName, passiveEffect.ToString(), passiveEffect, statLabel, tierStatValues, 1, 6, requiredAnyTagExpressions)
         {
         }
 
@@ -26,6 +26,33 @@ namespace AffixSystem.Affixes
             string statLabel,
             int[] tierStatValues,
             params string[] requiredAnyTagExpressions)
+            : this(id, displayName, family, passiveEffect, statLabel, tierStatValues, 1, 6, requiredAnyTagExpressions)
+        {
+        }
+
+        public AffixDefinition(
+            string id,
+            string displayName,
+            PassiveEffects passiveEffect,
+            string statLabel,
+            int[] tierStatValues,
+            int minQuality,
+            int maxQuality,
+            params string[] requiredAnyTagExpressions)
+            : this(id, displayName, passiveEffect.ToString(), passiveEffect, statLabel, tierStatValues, minQuality, maxQuality, requiredAnyTagExpressions)
+        {
+        }
+
+        public AffixDefinition(
+            string id,
+            string displayName,
+            string family,
+            PassiveEffects passiveEffect,
+            string statLabel,
+            int[] tierStatValues,
+            int minQuality,
+            int maxQuality,
+            params string[] requiredAnyTagExpressions)
         {
             Id = id;
             DisplayName = displayName;
@@ -33,6 +60,13 @@ namespace AffixSystem.Affixes
             PassiveEffect = passiveEffect;
             StatLabel = statLabel;
             TierStatValues = tierStatValues;
+            MinQuality = ClampQuality(minQuality);
+            MaxQuality = ClampQuality(maxQuality);
+            if (MaxQuality < MinQuality)
+            {
+                MaxQuality = MinQuality;
+            }
+
             this.requiredAnyTagExpressions = requiredAnyTagExpressions;
             requiredAnyTags = new FastTags<TagGroup.Global>[requiredAnyTagExpressions.Length];
 
@@ -54,14 +88,36 @@ namespace AffixSystem.Affixes
 
         public int[] TierStatValues { get; }
 
+        public int MinQuality { get; }
+
+        public int MaxQuality { get; }
+
         public string RequirementSummary
         {
             get
             {
-                return requiredAnyTagExpressions.Length == 0
+                string tags = requiredAnyTagExpressions.Length == 0
                     ? "any supported item"
                     : string.Join(" | ", requiredAnyTagExpressions);
+
+                if (MinQuality <= 1 && MaxQuality >= 6)
+                {
+                    return tags;
+                }
+
+                string quality = MinQuality == MaxQuality
+                    ? "Q" + MinQuality
+                    : "Q" + MinQuality + "-Q" + MaxQuality;
+
+                return quality + ", " + tags;
             }
+        }
+
+        public bool IsAllowedOn(ItemValue itemValue)
+        {
+            return itemValue != null &&
+                IsQualityAllowed((int)itemValue.Quality) &&
+                IsAllowedOn(itemValue.ItemClass);
         }
 
         public bool IsAllowedOn(ItemClass itemClass)
@@ -98,6 +154,22 @@ namespace AffixSystem.Affixes
             float percent = statValue * 0.5f;
             string prefix = percent > 0f ? "+" : "";
             return prefix + percent.ToString("0.#") + "% " + StatLabel;
+        }
+
+        private bool IsQualityAllowed(int quality)
+        {
+            quality = ClampQuality(quality);
+            return quality >= MinQuality && quality <= MaxQuality;
+        }
+
+        private static int ClampQuality(int quality)
+        {
+            if (quality < 1)
+            {
+                return 1;
+            }
+
+            return quality > 6 ? 6 : quality;
         }
     }
 }
