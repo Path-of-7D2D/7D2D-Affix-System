@@ -39,7 +39,7 @@ namespace AffixSystem.Affixes
 
         public bool IsAllowedOn(ItemClass itemClass)
         {
-            if (itemClass == null || !itemClass.HasAnyTags(FastTags<TagGroup.Global>.Parse("weapon")))
+            if (!AffixEligibility.IsSupportedBaseItem(itemClass))
             {
                 return false;
             }
@@ -74,4 +74,3 @@ namespace AffixSystem.Affixes
         }
     }
 }
-

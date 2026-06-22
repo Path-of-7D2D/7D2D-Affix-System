@@ -18,6 +18,8 @@ namespace AffixSystem.Affixes
 
         public IReadOnlyList<AffixInstance> Affixes { get; }
 
+        public bool IsDisplayable => Rarity == AffixRarity.Magic || Rarity == AffixRarity.Rare;
+
         public static bool TryRead(ItemValue itemValue, out AffixItemState state)
         {
             state = null;
@@ -77,6 +79,16 @@ namespace AffixSystem.Affixes
             return true;
         }
 
+        public static bool TryReadDisplayable(ItemValue itemValue, out AffixItemState state)
+        {
+            if (!TryRead(itemValue, out state))
+            {
+                return false;
+            }
+
+            return state.IsDisplayable;
+        }
+
         public void WriteTo(ItemValue itemValue)
         {
             itemValue.SetMetadata(MetadataKey, Serialize());
@@ -99,4 +111,3 @@ namespace AffixSystem.Affixes
         }
     }
 }
-

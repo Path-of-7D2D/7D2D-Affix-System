@@ -40,9 +40,17 @@ namespace AffixSystem.Affixes
             return "[" + color + "]" + rarity + " Affixes[-] [" + MutedColor + "](" + state.Affixes.Count + ")[-]";
         }
 
-        public static string BuildAffixDetails(AffixItemState state)
+        public static string BuildAffixTabText(AffixItemState state)
         {
             var builder = new StringBuilder();
+            builder.Append(BuildAffixHeader(state)).Append("\n\n");
+            AppendAffixRows(builder, state);
+
+            return builder.ToString().TrimEnd();
+        }
+
+        private static void AppendAffixRows(StringBuilder builder, AffixItemState state)
+        {
             for (int i = 0; i < state.Affixes.Count; i++)
             {
                 AffixInstance affix = state.Affixes[i];
@@ -53,13 +61,11 @@ namespace AffixSystem.Affixes
 
                 builder
                     .Append('[').Append(GetTierColor(affix.Tier)).Append("]T").Append(affix.Tier).Append("[-] ")
-                    .Append("[FFFFFF]").Append(definition.DisplayName).Append("[-]  ")
+                    .Append("[FFFFFF]").Append(definition.DisplayName).Append("[-]: ")
                     .Append("[").Append(ValueColor).Append(']')
                     .Append(definition.FormatValue(affix.StatValue))
                     .Append("[-]\n");
             }
-
-            return builder.ToString().TrimEnd();
         }
 
         public static string BuildSummary(AffixItemState state)

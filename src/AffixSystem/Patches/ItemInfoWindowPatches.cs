@@ -12,9 +12,6 @@ namespace AffixSystem.Patches
         {
             ItemInfoWindowAffixViewState state = ItemInfoWindowPatches.GetState(__instance);
             state.AffixButton = __instance.GetChildById("affixButton");
-            state.AffixPanel = __instance.GetChildById("affixPanel");
-            state.AffixHeaderLabel = __instance.GetChildById("affixHeader");
-            state.AffixDescriptionLabel = __instance.GetChildById("affixDescription");
 
             if (state.AffixButton != null && !state.IsHooked)
             {
@@ -64,11 +61,6 @@ namespace AffixSystem.Patches
                 return;
             }
 
-            if (ItemInfoWindowPatches.TryHandleCustomBinding(__instance, bindingName, ref value, ref __result))
-            {
-                return;
-            }
-
             if (!__result)
             {
                 return;
@@ -85,11 +77,10 @@ namespace AffixSystem.Patches
                 return;
             }
 
-            if (ItemInfoWindowPatches.IsShowingAffixes(__instance) &&
-                (bindingName.Equals("showstats", StringComparison.OrdinalIgnoreCase) ||
-                 bindingName.Equals("showdescription", StringComparison.OrdinalIgnoreCase)))
+            if (bindingName.Equals("itemdescription", StringComparison.OrdinalIgnoreCase) &&
+                ItemInfoWindowPatches.IsShowingAffixes(__instance))
             {
-                value = false.ToString();
+                value = AffixDisplay.BuildAffixTabText(affixState);
             }
         }
     }
@@ -126,7 +117,6 @@ namespace AffixSystem.Patches
         {
             ItemInfoWindowAffixViewState state = GetState(instance);
             state.ShowAffixes = false;
-            SetViewVisible(state.AffixPanel, false);
             SetSelected(state.AffixButton, false);
             RefreshTabBindings(instance);
         }
@@ -142,11 +132,7 @@ namespace AffixSystem.Patches
             }
 
             SetViewVisible(state.AffixButton, hasAffixes);
-            SetViewVisible(state.AffixPanel, hasAffixes && state.ShowAffixes);
             SetSelected(state.AffixButton, hasAffixes && state.ShowAffixes);
-
-            SetLabelText(state.AffixHeaderLabel, hasAffixes ? AffixDisplay.BuildAffixHeader(affixState) : string.Empty);
-            SetLabelText(state.AffixDescriptionLabel, hasAffixes ? AffixDisplay.BuildAffixDetails(affixState) : string.Empty);
         }
 
         public static bool HasAffixes(XUiC_ItemInfoWindow instance)
@@ -159,61 +145,15 @@ namespace AffixSystem.Patches
             return GetState(instance).ShowAffixes && TryGetDisplayableAffixes(instance, out _);
         }
 
-        public static bool TryHandleCustomBinding(
-            XUiC_ItemInfoWindow instance,
-            string bindingName,
-            ref string value,
-            ref bool result)
-        {
-            if (bindingName.Equals("hasaffixes", StringComparison.OrdinalIgnoreCase))
-            {
-                value = HasAffixes(instance).ToString();
-                result = true;
-                return true;
-            }
-
-            if (bindingName.Equals("showaffixes", StringComparison.OrdinalIgnoreCase))
-            {
-                value = IsShowingAffixes(instance).ToString();
-                result = true;
-                return true;
-            }
-
-            if (bindingName.Equals("affixheader", StringComparison.OrdinalIgnoreCase))
-            {
-                value = TryGetDisplayableAffixes(instance, out AffixItemState state)
-                    ? AffixDisplay.BuildAffixHeader(state)
-                    : string.Empty;
-                result = true;
-                return true;
-            }
-
-            if (bindingName.Equals("affixdescription", StringComparison.OrdinalIgnoreCase))
-            {
-                value = TryGetDisplayableAffixes(instance, out AffixItemState state)
-                    ? AffixDisplay.BuildAffixDetails(state)
-                    : string.Empty;
-                result = true;
-                return true;
-            }
-
-            return false;
-        }
-
         private static bool TryGetDisplayableAffixes(XUiC_ItemInfoWindow instance, out AffixItemState state)
         {
-            state = null;
             if (instance?.itemStack == null || instance.itemStack.IsEmpty())
             {
+                state = null;
                 return false;
             }
 
-            if (!AffixItemState.TryRead(instance.itemStack.itemValue, out state))
-            {
-                return false;
-            }
-
-            return state.Rarity == AffixRarity.Magic || state.Rarity == AffixRarity.Rare;
+            return AffixEligibility.TryGetDisplayableState(instance.itemStack.itemValue, out state);
         }
 
         private static void SetViewVisible(XUiController controller, bool visible)
@@ -244,24 +184,11 @@ namespace AffixSystem.Patches
             }
         }
 
-        private static void SetLabelText(XUiController controller, string text)
-        {
-            if (controller?.ViewComponent is XUiV_Label label)
-            {
-                label.Text = text;
-            }
-        }
     }
 
     internal sealed class ItemInfoWindowAffixViewState
     {
         public XUiController AffixButton { get; set; }
-
-        public XUiController AffixPanel { get; set; }
-
-        public XUiController AffixHeaderLabel { get; set; }
-
-        public XUiController AffixDescriptionLabel { get; set; }
 
         public bool IsHooked { get; set; }
 
