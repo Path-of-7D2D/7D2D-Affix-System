@@ -68,3 +68,7 @@ affixspawn rare gunHandgunT1Pistol 6 true
 ```
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
