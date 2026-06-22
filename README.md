@@ -69,6 +69,7 @@ affix currency [count=1]
 affix augment
 affix list [all|held]
 affix validate [itemName] [quality=6]
+affix rolltest <itemName> [quality=6] [samples=1000] [source]
 affix debug loot <on|off>
 affix debug rarity [source]
 affix reload
@@ -100,6 +101,7 @@ affix validate meleeToolPickT1IronPickaxe 6
 affix validate meleeToolPickT3Auger 6
 affix validate armorPrimitiveHelmet 6
 affix validate armorMinerOutfit 6
+affix rolltest gunHandgunT1Pistol 6 1000 container:hardenedChestT5
 affix debug loot on
 affix debug rarity container:hardenedChestT5
 ```
@@ -117,6 +119,11 @@ Use `affix list held` or `affix validate` to inspect which affixes can still
 roll on the held item. Use `affix validate <itemName> <quality>` to inspect a
 specific base item without spawning it. `affix list all` also shows each
 affix's duplicate-prevention family.
+
+Use `affix rolltest <itemName> <quality> <samples> [source]` to simulate
+natural loot rolls without creating items. The output reports effective
+Magic/Rare weights, rarity results, average affix counts, average tier, and the
+most common rolled affix IDs.
 
 ## Tuning
 

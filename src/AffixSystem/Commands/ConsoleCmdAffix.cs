@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using AffixSystem.Affixes;
 using AffixSystem.Config;
@@ -75,6 +76,12 @@ namespace AffixSystem.Commands
                 return;
             }
 
+            if (subcommand.Equals("rolltest", StringComparison.OrdinalIgnoreCase))
+            {
+                RollTest(_params);
+                return;
+            }
+
             if (subcommand.Equals("debug", StringComparison.OrdinalIgnoreCase))
             {
                 Debug(_params);
@@ -100,7 +107,7 @@ namespace AffixSystem.Commands
 
         public override string getDescription()
         {
-            return "usage: affix <spawn|inspect|currency|augment|list|validate|debug|reload|help>";
+            return "usage: affix <spawn|inspect|currency|augment|list|validate|rolltest|debug|reload|help>";
         }
 
         public override string getHelp()
@@ -113,6 +120,7 @@ namespace AffixSystem.Commands
                 "  affix augment\n" +
                 "  affix list [all|held]\n" +
                 "  affix validate [itemName] [quality=6]\n" +
+                "  affix rolltest <itemName> [quality=6] [samples=1000] [source]\n" +
                 "  affix debug loot <on|off>\n" +
                 "  affix debug rarity [source]\n" +
                 "  affix reload\n" +
@@ -130,6 +138,7 @@ namespace AffixSystem.Commands
                 "  affix validate meleeWpnBladeT1HuntingKnife 5\n" +
                 "  affix validate meleeToolPickT1IronPickaxe 6\n" +
                 "  affix validate armorPrimitiveHelmet 6\n" +
+                "  affix rolltest gunHandgunT1Pistol 6 1000 container:hardenedChestT5\n" +
                 "  affix debug loot on\n" +
                 "  affix debug rarity container:hardenedChestT5";
         }
@@ -344,6 +353,96 @@ namespace AffixSystem.Commands
             Output("Legal new affixes (" + legal.Count + "): " + BuildAffixDefinitionList(legal));
         }
 
+        private static void RollTest(List<string> parameters)
+        {
+            if (parameters.Count < 2)
+            {
+                Output("usage: affix rolltest <itemName> [quality=6] [samples=1000] [source]");
+                return;
+            }
+
+            string itemName = parameters[1];
+            int quality = ParseQuality(parameters.Count > 2 ? parameters[2] : null);
+            int samples = ParseSampleCount(parameters.Count > 3 ? parameters[3] : null);
+            string source = parameters.Count > 4
+                ? string.Join(" ", parameters.GetRange(4, parameters.Count - 4).ToArray())
+                : null;
+
+            ItemValue lookup = ItemClass.GetItem(itemName, _caseInsensitive: true);
+            if (lookup.IsEmpty())
+            {
+                Output("Unknown item name: " + itemName);
+                return;
+            }
+
+            ItemValue testItem = new ItemValue(lookup.type, quality, quality, _bCreateDefaultModItems: false);
+            if (!AffixEligibility.IsSupportedBaseItem(testItem))
+            {
+                Output(itemName + " is not a supported affix base item.");
+                return;
+            }
+
+            List<AffixDefinition> legal = AffixCatalog.GetLegalAffixes(testItem);
+            if (legal.Count == 0)
+            {
+                Output("No legal affixes are available for " + itemName + " Q" + quality + ".");
+                return;
+            }
+
+            var random = new System.Random(unchecked(Environment.TickCount ^ lookup.type ^ quality ^ (int)DateTime.UtcNow.Ticks));
+            var affixCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            int magic = 0;
+            int rare = 0;
+            int noAffixes = 0;
+            int totalAffixes = 0;
+            int totalTier = 0;
+
+            for (int i = 0; i < samples; i++)
+            {
+                ItemValue itemValue = new ItemValue(lookup.type, quality, quality, _bCreateDefaultModItems: false);
+                AffixRarity rarity = AffixTuning.ChooseLootRarity(random, source);
+                if (rarity == AffixRarity.Rare)
+                {
+                    rare++;
+                }
+                else
+                {
+                    magic++;
+                }
+
+                int affixCount = AffixTuning.GetNaturalAffixCount(rarity, quality, random);
+                AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount);
+                if (state.Affixes.Count == 0)
+                {
+                    noAffixes++;
+                    continue;
+                }
+
+                totalAffixes += state.Affixes.Count;
+                for (int affixIndex = 0; affixIndex < state.Affixes.Count; affixIndex++)
+                {
+                    AffixInstance affix = state.Affixes[affixIndex];
+                    totalTier += affix.Tier;
+                    if (!affixCounts.ContainsKey(affix.DefinitionId))
+                    {
+                        affixCounts[affix.DefinitionId] = 0;
+                    }
+
+                    affixCounts[affix.DefinitionId]++;
+                }
+            }
+
+            Output("Rolltest: " + itemName + " Q" + quality + ", samples " + samples + ", source " + (string.IsNullOrEmpty(source) ? "default loot" : source));
+            Output("Weights: " + AffixTuning.GetLootRarityWeightSummary(source));
+            Output("Natural counts for Q" + quality + ": Magic " +
+                AffixTuning.GetNaturalAffixCountSummary(AffixRarity.Magic, quality) +
+                ", Rare " +
+                AffixTuning.GetNaturalAffixCountSummary(AffixRarity.Rare, quality));
+            Output("Rarity results: Magic " + magic + " (" + FormatPercent(magic, samples) + "), Rare " + rare + " (" + FormatPercent(rare, samples) + ")");
+            Output("Average affixes/item: " + FormatAverage(totalAffixes, samples) + ", average tier: " + FormatAverage(totalTier, totalAffixes) + ", no-affix rolls: " + noAffixes);
+            Output("Top affixes: " + BuildTopAffixCounts(affixCounts, totalAffixes, 10));
+        }
+
         private static bool TryGetValidationItem(List<string> parameters, out ItemValue itemValue, out string itemName)
         {
             itemValue = null;
@@ -505,6 +604,26 @@ namespace AffixSystem.Commands
             return count;
         }
 
+        private static int ParseSampleCount(string raw)
+        {
+            if (!int.TryParse(raw, out int count))
+            {
+                return 1000;
+            }
+
+            if (count < 1)
+            {
+                return 1;
+            }
+
+            if (count > 10000)
+            {
+                return 10000;
+            }
+
+            return count;
+        }
+
         private static bool TryGetAugmentCurrency(out ItemValue currency)
         {
             ItemValue lookup = ItemClass.GetItem(AffixTuning.AugmentItemName, _caseInsensitive: true);
@@ -562,6 +681,63 @@ namespace AffixSystem.Commands
             }
 
             return builder.ToString();
+        }
+
+        private static string BuildTopAffixCounts(Dictionary<string, int> counts, int totalAffixes, int limit)
+        {
+            if (counts.Count == 0 || totalAffixes <= 0)
+            {
+                return "none";
+            }
+
+            var sorted = new List<KeyValuePair<string, int>>(counts);
+            sorted.Sort((left, right) =>
+            {
+                int valueCompare = right.Value.CompareTo(left.Value);
+                return valueCompare != 0
+                    ? valueCompare
+                    : string.Compare(left.Key, right.Key, StringComparison.OrdinalIgnoreCase);
+            });
+
+            var builder = new StringBuilder();
+            int count = Math.Min(limit, sorted.Count);
+            for (int i = 0; i < count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(", ");
+                }
+
+                KeyValuePair<string, int> entry = sorted[i];
+                builder.Append(entry.Key);
+                builder.Append(" ");
+                builder.Append(entry.Value.ToString(CultureInfo.InvariantCulture));
+                builder.Append(" (");
+                builder.Append(FormatPercent(entry.Value, totalAffixes));
+                builder.Append(")");
+            }
+
+            return builder.ToString();
+        }
+
+        private static string FormatPercent(int value, int total)
+        {
+            if (total <= 0)
+            {
+                return "0%";
+            }
+
+            return ((value * 100.0) / total).ToString("0.0", CultureInfo.InvariantCulture) + "%";
+        }
+
+        private static string FormatAverage(int value, int total)
+        {
+            if (total <= 0)
+            {
+                return "0";
+            }
+
+            return ((double)value / total).ToString("0.00", CultureInfo.InvariantCulture);
         }
 
         private static void Output(string message)

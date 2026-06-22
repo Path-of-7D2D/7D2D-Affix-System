@@ -64,6 +64,9 @@ Build properties match the other local Path-of-7D2D modlets:
   high-risk source with increased Rare weight.
 - Run `affix debug rarity container:groupSmallWeaponBag` and confirm it reports
   the standard Magic/Rare weights.
+- Run `affix rolltest gunHandgunT1Pistol 6 1000 container:groupSmallWeaponBag`
+  and `affix rolltest gunHandgunT1Pistol 6 1000 container:hardenedChestT5`;
+  confirm the hardened chest sample trends toward a higher Rare rate.
 - Open high-value loot such as weapon bags, toolboxes, armor racks,
   reinforced/hardened chests, infestation rewards, or zombie loot bags and
   confirm `Affix Augment` can appear without being sold as normal trader stock.
