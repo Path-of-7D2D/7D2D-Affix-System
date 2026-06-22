@@ -21,9 +21,13 @@ namespace AffixSystem.Config
 
         public static int RareLootWeight { get; private set; } = 25;
 
-        public static int MagicAffixCap { get; private set; } = 2;
+        public static int MagicNaturalAffixCount { get; private set; } = 2;
 
-        public static int RareAffixCap { get; private set; } = 4;
+        public static int RareNaturalAffixCount { get; private set; } = 4;
+
+        public static int MagicAffixCap { get; private set; } = 3;
+
+        public static int RareAffixCap { get; private set; } = 6;
 
         public static string AugmentItemName { get; private set; } = DefaultAugmentItemName;
 
@@ -54,6 +58,8 @@ namespace AffixSystem.Config
                 LootDebugLogging = ReadBool(root, "loot/debugLogging", LootDebugLogging);
                 MagicLootWeight = ReadInt(root, "loot/rarityWeights/magic", MagicLootWeight, 0, 100000);
                 RareLootWeight = ReadInt(root, "loot/rarityWeights/rare", RareLootWeight, 0, 100000);
+                MagicNaturalAffixCount = ReadInt(root, "loot/affixCounts/magic", MagicNaturalAffixCount, 1, 6);
+                RareNaturalAffixCount = ReadInt(root, "loot/affixCounts/rare", RareNaturalAffixCount, 1, 6);
                 MagicAffixCap = ReadInt(root, "affixCaps/magic", MagicAffixCap, 1, 6);
                 RareAffixCap = ReadInt(root, "affixCaps/rare", RareAffixCap, 1, 6);
                 AugmentItemName = ReadString(root, "currency/augmentItemName", AugmentItemName);
@@ -96,6 +102,11 @@ namespace AffixSystem.Config
             return rarity == AffixRarity.Rare ? RareAffixCap : MagicAffixCap;
         }
 
+        public static int GetNaturalAffixCount(AffixRarity rarity)
+        {
+            return rarity == AffixRarity.Rare ? RareNaturalAffixCount : MagicNaturalAffixCount;
+        }
+
         public static void LogLoot(string message)
         {
             if (LootDebugLogging)
@@ -110,8 +121,10 @@ namespace AffixSystem.Config
             LootDebugLogging = false;
             MagicLootWeight = 75;
             RareLootWeight = 25;
-            MagicAffixCap = 2;
-            RareAffixCap = 4;
+            MagicNaturalAffixCount = 2;
+            RareNaturalAffixCount = 4;
+            MagicAffixCap = 3;
+            RareAffixCap = 6;
             AugmentItemName = DefaultAugmentItemName;
         }
 

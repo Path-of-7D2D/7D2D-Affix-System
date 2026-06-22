@@ -7,10 +7,14 @@
       <magic>75</magic>
       <rare>25</rare>
     </rarityWeights>
+    <affixCounts>
+      <magic>2</magic>
+      <rare>4</rare>
+    </affixCounts>
   </loot>
   <affixCaps>
-    <magic>2</magic>
-    <rare>4</rare>
+    <magic>3</magic>
+    <rare>6</rare>
   </affixCaps>
   <currency>
     <augmentItemName>resourceAffixAugment</augmentItemName>

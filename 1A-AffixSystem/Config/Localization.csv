@@ -1,0 +1,3 @@
+Key,File,Type,UsedInMainMenu,NoTranslate,KeepLoaded,english
+resourceAffixAugment,items,Item,,,,Affix Augment
+resourceAffixAugmentDesc,items,Item,,,,Adds one new affix to a Magic or Rare affixed weapon that has room for another affix.

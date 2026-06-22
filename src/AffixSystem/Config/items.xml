@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+  <append xpath="/items">
+    <item name="resourceAffixAugment">
+      <property name="Extends" value="resourceLegendaryParts"/>
+      <property name="CustomIcon" value="resourceLegendaryParts"/>
+      <property name="CustomIconTint" value="78,180,255"/>
+      <property name="Stacknumber" value="25"/>
+      <property name="EconomicValue" value="250"/>
+      <property name="Group" value="Resources"/>
+      <property name="CreativeMode" value="Player"/>
+    </item>
+  </append>
+</configs>

@@ -50,6 +50,18 @@ namespace AffixSystem.Commands
                 return;
             }
 
+            if (subcommand.Equals("currency", StringComparison.OrdinalIgnoreCase))
+            {
+                GiveCurrency(_params);
+                return;
+            }
+
+            if (subcommand.Equals("augment", StringComparison.OrdinalIgnoreCase))
+            {
+                AugmentHeldItem();
+                return;
+            }
+
             if (subcommand.Equals("debug", StringComparison.OrdinalIgnoreCase))
             {
                 Debug(_params);
@@ -75,7 +87,7 @@ namespace AffixSystem.Commands
 
         public override string getDescription()
         {
-            return "usage: affix <spawn|inspect|debug|reload|help>";
+            return "usage: affix <spawn|inspect|currency|augment|debug|reload|help>";
         }
 
         public override string getHelp()
@@ -84,6 +96,8 @@ namespace AffixSystem.Commands
                 "Subcommands:\n" +
                 "  affix spawn <magic|rare> [itemName=" + DefaultWeapon + "] [quality=6] [drop=false]\n" +
                 "  affix inspect\n" +
+                "  affix currency [count=1]\n" +
+                "  affix augment\n" +
                 "  affix debug loot <on|off>\n" +
                 "  affix reload\n" +
                 "Examples:\n" +
@@ -92,6 +106,8 @@ namespace AffixSystem.Commands
                 "  affix spawn rare meleeWpnBladeT1HuntingKnife 5\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6 true\n" +
                 "  affix inspect\n" +
+                "  affix currency 3\n" +
+                "  affix augment\n" +
                 "  affix debug loot on";
         }
 
@@ -129,7 +145,7 @@ namespace AffixSystem.Commands
             }
 
             var random = new System.Random(unchecked(Environment.TickCount ^ itemValue.Seed ^ (int)DateTime.UtcNow.Ticks));
-            AffixItemState state = AffixRoller.Roll(itemValue, rarity, random);
+            AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, AffixTuning.GetNaturalAffixCount(rarity));
             if (state.Affixes.Count == 0)
             {
                 Output("No legal affixes were available for " + itemName + ".");
@@ -151,6 +167,74 @@ namespace AffixSystem.Commands
             }
 
             Output(AffixDisplay.BuildSummary(state));
+        }
+
+        private static void GiveCurrency(List<string> parameters)
+        {
+            int count = ParseCount(parameters.Count > 1 ? parameters[1] : null);
+            EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
+            if (player == null)
+            {
+                Output("No local player is available.");
+                return;
+            }
+
+            if (!TryGetAugmentCurrency(out ItemValue currency))
+            {
+                Output("Unknown augment currency item: " + AffixTuning.AugmentItemName);
+                return;
+            }
+
+            player.bag.AddItem(new ItemStack(currency, count));
+            Output("Added " + count + " " + AffixTuning.AugmentItemName + " to backpack.");
+        }
+
+        private static void AugmentHeldItem()
+        {
+            EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
+            if (player == null)
+            {
+                Output("No local player is available.");
+                return;
+            }
+
+            ItemStack held = player.inventory.holdingItemStack;
+            if (held == null || held.IsEmpty() || player.inventory.holdingCount <= 0)
+            {
+                Output("Hold a Magic or Rare weapon in the toolbelt before running affix augment.");
+                return;
+            }
+
+            if (!TryGetAugmentCurrency(out ItemValue currency))
+            {
+                Output("Unknown augment currency item: " + AffixTuning.AugmentItemName);
+                return;
+            }
+
+            if (CountCurrency(player, currency) < 1)
+            {
+                Output("Requires 1 " + AffixTuning.AugmentItemName + ".");
+                return;
+            }
+
+            ItemValue itemValue = held.itemValue;
+            var random = new System.Random(unchecked(Environment.TickCount ^ itemValue.Seed ^ (int)DateTime.UtcNow.Ticks));
+            if (!AffixAugmenter.TryAddAffix(itemValue, random, out AffixItemState newState, out string message))
+            {
+                Output(message);
+                return;
+            }
+
+            if (!ConsumeOneCurrency(player, currency))
+            {
+                Output("Augment succeeded, but currency could not be consumed. Check inventory state.");
+            }
+
+            player.inventory.ForceHoldingItemUpdate();
+            player.inventory.CallOnToolbeltChangedInternal();
+
+            Output(message);
+            Output(AffixDisplay.BuildSummary(newState));
         }
 
         private static void InspectHeldItem()
@@ -259,6 +343,64 @@ namespace AffixSystem.Commands
             }
 
             return quality;
+        }
+
+        private static int ParseCount(string raw)
+        {
+            if (!int.TryParse(raw, out int count))
+            {
+                return 1;
+            }
+
+            if (count < 1)
+            {
+                return 1;
+            }
+
+            if (count > 500)
+            {
+                return 500;
+            }
+
+            return count;
+        }
+
+        private static bool TryGetAugmentCurrency(out ItemValue currency)
+        {
+            ItemValue lookup = ItemClass.GetItem(AffixTuning.AugmentItemName, _caseInsensitive: true);
+            if (lookup.IsEmpty())
+            {
+                currency = null;
+                return false;
+            }
+
+            currency = new ItemValue(lookup.type, false);
+            return true;
+        }
+
+        private static int CountCurrency(EntityPlayerLocal player, ItemValue currency)
+        {
+            int count = player.inventory.GetItemCount(currency, false, -1, -1, false);
+            count += player.bag.GetItemCount(currency, -1, -1, false);
+            return count;
+        }
+
+        private static bool ConsumeOneCurrency(EntityPlayerLocal player, ItemValue currency)
+        {
+            int before = CountCurrency(player, currency);
+            if (before < 1)
+            {
+                return false;
+            }
+
+            player.inventory.DecItem(currency, 1, false, null);
+            if (CountCurrency(player, currency) < before)
+            {
+                return true;
+            }
+
+            player.bag.DecItem(currency, 1, false, null);
+            return CountCurrency(player, currency) < before;
         }
 
         private static void Output(string message)
