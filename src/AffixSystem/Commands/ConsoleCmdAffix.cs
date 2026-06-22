@@ -122,7 +122,7 @@ namespace AffixSystem.Commands
                 "  affix validate [itemName] [quality=6]\n" +
                 "  affix rolltest <itemName> [quality=6] [samples=1000] [source]\n" +
                 "  affix debug loot <on|off>\n" +
-                "  affix debug rarity [source]\n" +
+                "  affix debug rarity [source] [quality=6]\n" +
                 "  affix reload\n" +
                 "Examples:\n" +
                 "  affix spawn magic\n" +
@@ -141,7 +141,7 @@ namespace AffixSystem.Commands
                 "  affix validate armorPrimitiveHelmet 6\n" +
                 "  affix rolltest gunHandgunT1Pistol 6 1000 container:hardenedChestT5\n" +
                 "  affix debug loot on\n" +
-                "  affix debug rarity container:hardenedChestT5";
+                "  affix debug rarity container:hardenedChestT5 6";
         }
 
         private static void Spawn(List<string> parameters)
@@ -410,7 +410,7 @@ namespace AffixSystem.Commands
             for (int i = 0; i < samples; i++)
             {
                 ItemValue itemValue = new ItemValue(lookup.type, quality, quality, _bCreateDefaultModItems: false);
-                AffixRarity rarity = AffixTuning.ChooseLootRarity(random, source);
+                AffixRarity rarity = AffixTuning.ChooseLootRarity(random, source, quality);
                 if (rarity == AffixRarity.Rare)
                 {
                     rare++;
@@ -443,7 +443,7 @@ namespace AffixSystem.Commands
             }
 
             Output("Rolltest: " + itemName + " Q" + quality + ", samples " + samples + ", source " + (string.IsNullOrEmpty(source) ? "default loot" : source));
-            Output("Weights: " + AffixTuning.GetLootRarityWeightSummary(source));
+            Output("Weights: " + AffixTuning.GetLootRarityWeightSummary(source, quality));
             Output("Natural counts for Q" + quality + ": Magic " +
                 AffixTuning.GetNaturalAffixCountSummary(AffixRarity.Magic, quality) +
                 ", Rare " +
@@ -522,11 +522,10 @@ namespace AffixSystem.Commands
 
             if (parameters[1].Equals("rarity", StringComparison.OrdinalIgnoreCase))
             {
-                string source = parameters.Count > 2
-                    ? string.Join(" ", parameters.GetRange(2, parameters.Count - 2).ToArray())
-                    : null;
+                string source = parameters.Count > 2 ? parameters[2] : null;
+                int quality = ParseQuality(parameters.Count > 3 ? parameters[3] : null);
 
-                Output("Rarity weights for " + (string.IsNullOrEmpty(source) ? "default loot" : source) + ": " + AffixTuning.GetLootRarityWeightSummary(source));
+                Output("Rarity weights for " + (string.IsNullOrEmpty(source) ? "default loot" : source) + ": " + AffixTuning.GetLootRarityWeightSummary(source, quality));
                 Output("High-risk patterns: " + AffixTuning.GetHighRiskSourcePatternSummary());
                 return;
             }

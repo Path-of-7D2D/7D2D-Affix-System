@@ -74,10 +74,12 @@ Build properties match the other local Path-of-7D2D modlets:
 - Open a fresh zombie loot bag with loot debug enabled and confirm the logged
   source starts with `loot-bag`, ideally including the owner name when the game
   provides one.
-- Run `affix debug rarity container:hardenedChestT5` and confirm it reports a
-  high-risk source with increased Rare weight.
+- Run `affix debug rarity container:hardenedChestT5 6` and confirm it reports a
+  high-risk Q6 source with increased Rare weight.
 - Run `affix debug rarity container:groupSmallWeaponBag` and confirm it reports
-  the standard Magic/Rare weights.
+  the standard Q6 Magic/Rare weights.
+- Run `affix debug rarity container:groupSmallWeaponBag 1` and confirm Q1 uses
+  a lower Rare weight than Q6.
 - Run `affix rolltest gunHandgunT1Pistol 6 1000 container:groupSmallWeaponBag`
   and `affix rolltest gunHandgunT1Pistol 6 1000 container:hardenedChestT5`;
   confirm the hardened chest sample trends toward a higher Rare rate.

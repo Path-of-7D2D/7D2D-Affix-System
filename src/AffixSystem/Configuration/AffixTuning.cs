@@ -36,6 +36,7 @@ namespace AffixSystem.Config
 
         private static IntRange[] magicNaturalAffixCountsByQuality = BuildDefaultMagicCountRanges();
         private static IntRange[] rareNaturalAffixCountsByQuality = BuildDefaultRareCountRanges();
+        private static RarityWeights[] rarityWeightsByQuality = BuildDefaultRarityWeightsByQuality();
         private static string[] highRiskSourcePatterns = BuildDefaultHighRiskSourcePatterns();
 
         public static void Load(Mod modInstance)
@@ -73,6 +74,11 @@ namespace AffixSystem.Config
                 AugmentItemName = ReadString(root, "currency/augmentItemName", AugmentItemName);
                 ReadHighRiskSourcePatterns(root);
 
+                if (!ReadRarityWeightsByQuality(root))
+                {
+                    FillRarityWeightsFromFixedWeights();
+                }
+
                 if (!ReadQualityCountRanges(root))
                 {
                     FillCountRangesFromFixedCounts();
@@ -104,9 +110,14 @@ namespace AffixSystem.Config
 
         public static AffixRarity ChooseLootRarity(Random random, string source)
         {
-            int magicWeight = Math.Max(0, MagicLootWeight);
-            int rareWeight = Math.Max(0, RareLootWeight);
-            ApplyHighRiskRarityBias(source, ref magicWeight, ref rareWeight);
+            return ChooseLootRarity(random, source, 6);
+        }
+
+        public static AffixRarity ChooseLootRarity(Random random, string source, int quality)
+        {
+            RarityWeights weights = GetLootRarityWeights(source, quality);
+            int magicWeight = weights.Magic;
+            int rareWeight = weights.Rare;
 
             int total = magicWeight + rareWeight;
             if (total <= 0)
@@ -120,13 +131,17 @@ namespace AffixSystem.Config
 
         public static string GetLootRarityWeightSummary(string source)
         {
-            int magicWeight = Math.Max(0, MagicLootWeight);
-            int rareWeight = Math.Max(0, RareLootWeight);
-            bool highRisk = IsHighRiskLootSource(source);
-            ApplyHighRiskRarityBias(source, ref magicWeight, ref rareWeight);
+            return GetLootRarityWeightSummary(source, 6);
+        }
 
-            return "Magic " + magicWeight.ToString(CultureInfo.InvariantCulture) +
-                ", Rare " + rareWeight.ToString(CultureInfo.InvariantCulture) +
+        public static string GetLootRarityWeightSummary(string source, int quality)
+        {
+            RarityWeights weights = GetLootRarityWeights(source, quality);
+            bool highRisk = IsHighRiskLootSource(source);
+
+            return "Q" + ClampQuality(quality).ToString(CultureInfo.InvariantCulture) +
+                " Magic " + weights.Magic.ToString(CultureInfo.InvariantCulture) +
+                ", Rare " + weights.Rare.ToString(CultureInfo.InvariantCulture) +
                 (highRisk ? " (high-risk source)" : " (standard source)");
         }
 
@@ -215,6 +230,7 @@ namespace AffixSystem.Config
             AugmentItemName = DefaultAugmentItemName;
             magicNaturalAffixCountsByQuality = BuildDefaultMagicCountRanges();
             rareNaturalAffixCountsByQuality = BuildDefaultRareCountRanges();
+            rarityWeightsByQuality = BuildDefaultRarityWeightsByQuality();
             highRiskSourcePatterns = BuildDefaultHighRiskSourcePatterns();
         }
 
@@ -315,6 +331,57 @@ namespace AffixSystem.Config
             }
         }
 
+        private static bool ReadRarityWeightsByQuality(XmlNode root)
+        {
+            XmlNodeList nodes = root.SelectNodes("loot/rarityWeightsByQuality/quality");
+            if (nodes == null || nodes.Count == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                XmlNode node = nodes[i];
+                if (node?.Attributes == null)
+                {
+                    continue;
+                }
+
+                if (!int.TryParse(node.Attributes["value"]?.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int quality))
+                {
+                    continue;
+                }
+
+                quality = ClampQuality(quality);
+                rarityWeightsByQuality[quality] = ReadRarityWeightsAttributes(node, rarityWeightsByQuality[quality]);
+            }
+
+            return true;
+        }
+
+        private static RarityWeights ReadRarityWeightsAttributes(XmlNode node, RarityWeights fallback)
+        {
+            int magic = ReadIntAttribute(node, "magic", fallback.Magic, 0, 100000);
+            int rare = ReadIntAttribute(node, "rare", fallback.Rare, 0, 100000);
+            return new RarityWeights(magic, rare);
+        }
+
+        private static int ReadIntAttribute(XmlNode node, string attributeName, int fallback, int min, int max)
+        {
+            string raw = node.Attributes?[attributeName]?.Value;
+            if (!int.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
+            {
+                return fallback;
+            }
+
+            if (value < min)
+            {
+                return min;
+            }
+
+            return value > max ? max : value;
+        }
+
         private static bool ReadQualityCountRanges(XmlNode root)
         {
             XmlNodeList nodes = root.SelectNodes("loot/affixCountsByQuality/quality");
@@ -407,6 +474,15 @@ namespace AffixSystem.Config
             }
         }
 
+        private static void FillRarityWeightsFromFixedWeights()
+        {
+            var weights = new RarityWeights(Math.Max(0, MagicLootWeight), Math.Max(0, RareLootWeight));
+            for (int quality = 1; quality <= 6; quality++)
+            {
+                rarityWeightsByQuality[quality] = weights;
+            }
+        }
+
         private static IntRange[] BuildDefaultMagicCountRanges()
         {
             var ranges = new IntRange[7];
@@ -440,6 +516,27 @@ namespace AffixSystem.Config
                 "infestedT4",
                 "infestedT5"
             };
+        }
+
+        private static RarityWeights[] BuildDefaultRarityWeightsByQuality()
+        {
+            var weights = new RarityWeights[7];
+            weights[1] = new RarityWeights(80, 20);
+            weights[2] = new RarityWeights(80, 20);
+            weights[3] = new RarityWeights(70, 30);
+            weights[4] = new RarityWeights(70, 30);
+            weights[5] = new RarityWeights(60, 40);
+            weights[6] = new RarityWeights(60, 40);
+            return weights;
+        }
+
+        private static RarityWeights GetLootRarityWeights(string source, int quality)
+        {
+            RarityWeights weights = rarityWeightsByQuality[ClampQuality(quality)];
+            int magicWeight = Math.Max(0, weights.Magic);
+            int rareWeight = Math.Max(0, weights.Rare);
+            ApplyHighRiskRarityBias(source, ref magicWeight, ref rareWeight);
+            return new RarityWeights(magicWeight, rareWeight);
         }
 
         private static void ApplyHighRiskRarityBias(string source, ref int magicWeight, ref int rareWeight)
@@ -485,6 +582,19 @@ namespace AffixSystem.Config
             public int Min { get; }
 
             public int Max { get; }
+        }
+
+        private readonly struct RarityWeights
+        {
+            public RarityWeights(int magic, int rare)
+            {
+                Magic = magic;
+                Rare = rare;
+            }
+
+            public int Magic { get; }
+
+            public int Rare { get; }
         }
     }
 }

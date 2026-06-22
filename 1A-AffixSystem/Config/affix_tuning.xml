@@ -8,6 +8,14 @@
       <rare>25</rare>
       <highRiskRareBonus>10</highRiskRareBonus>
     </rarityWeights>
+    <rarityWeightsByQuality>
+      <quality value="1" magic="80" rare="20"/>
+      <quality value="2" magic="80" rare="20"/>
+      <quality value="3" magic="70" rare="30"/>
+      <quality value="4" magic="70" rare="30"/>
+      <quality value="5" magic="60" rare="40"/>
+      <quality value="6" magic="60" rare="40"/>
+    </rarityWeightsByQuality>
     <highRiskSources>
       <source>reinforcedChestT3</source>
       <source>hardenedChest</source>
