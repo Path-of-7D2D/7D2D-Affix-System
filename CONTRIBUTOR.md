@@ -1,0 +1,36 @@
+# Contributor Guide
+
+## Project Layout
+
+```text
+1A-AffixSystem/              deployable mod folder
+  ModInfo.xml                mod manifest
+  AffixSystem.dll            built Harmony mod assembly
+
+src/AffixSystem/             C# source
+  AffixSystem.csproj
+  AffixSystemModApi.cs       IModApi entry point and Harmony bootstrap
+```
+
+## Build
+
+```sh
+dotnet build src/AffixSystem/AffixSystem.csproj -c Release
+```
+
+Build properties match the other local Path-of-7D2D modlets:
+
+- `Game7D2D` overrides the local game install path.
+- `GAME_7D2D` can also provide the game install path.
+- `InstallToGame=false` disables live install refresh.
+
+## Validation
+
+- Build in Release.
+- Launch the game with EasyAntiCheat off.
+- Load a world.
+- Run `affixspawn rare`.
+- Confirm the item appears in the backpack or drops at the player.
+- Confirm the item info panel shows rarity, affix tier lines, and boosted stat
+  numbers.
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+	<Name value="AffixSystem" />
+	<DisplayName value="Affix System" />
+	<Description value="Adds command-spawned prototype Magic and Rare affixed weapons." />
+	<Author value="Path-of-7D2D" />
+	<Version value="0.1.0" />
+	<Website value="https://github.com/Path-of-7D2D/7D2D-Affix-System" />
+	<SkipWithAntiCheat value="true" />
+</xml>
+
