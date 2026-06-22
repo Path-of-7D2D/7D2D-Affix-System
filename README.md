@@ -2,16 +2,16 @@
 
 Barebones affix prototype for 7 Days to Die V3.0.
 
-This pass supports command-spawned affixed weapons and tools, fresh generated loot rolls,
+This pass supports command-spawned affixed weapons, tools, and armor, fresh generated loot rolls,
 and a prototype augment currency for adding one new affix to an existing Magic
 or Rare item.
 
 ## Features
 
 - Adds a Harmony-backed modlet.
-- Adds a cheat command for spawning Magic or Rare weapons and tools.
+- Adds a cheat command for spawning Magic or Rare weapons, tools, and armor.
 - Rolls Magic or Rare affixes onto newly generated loot container and loot bag
-  weapons and tools.
+  weapons, tools, and armor.
 - Stores affix state on the item instance.
 - Applies affix values through `ItemValue` stat boosts.
 - Adds a star Affixes tab next to Stats and Description in the item info panel.
@@ -21,6 +21,8 @@ or Rare item.
   stats do not roll on the wrong weapon type.
 - Adds the first tool-specific affix pool for block damage, harvest count,
   stamina cost, durability, motor tools, and lower-value entity damage.
+- Adds the first armor-specific affix pool for health, stamina, movement,
+  stealth, resistances, carry capacity, and conservative global damage.
 
 ## Install
 
@@ -80,6 +82,8 @@ affix spawn rare gunHandgunT1Pistol 6
 affix spawn rare meleeWpnBladeT1HuntingKnife 5
 affix spawn rare meleeToolPickT1IronPickaxe 6
 affix spawn rare meleeToolPickT3Auger 6
+affix spawn rare armorPrimitiveHelmet 6
+affix spawn rare armorMinerOutfit 6
 affix spawn rare gunHandgunT1Pistol 6 true
 affix inspect
 affix currency 3
@@ -88,6 +92,8 @@ affix list held
 affix validate meleeWpnBladeT1HuntingKnife 5
 affix validate meleeToolPickT1IronPickaxe 6
 affix validate meleeToolPickT3Auger 6
+affix validate armorPrimitiveHelmet 6
+affix validate armorMinerOutfit 6
 affix debug loot on
 ```
 

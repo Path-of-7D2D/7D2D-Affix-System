@@ -120,6 +120,7 @@ namespace AffixSystem.Commands
                 "  affix spawn rare gunHandgunT1Pistol 6\n" +
                 "  affix spawn rare meleeWpnBladeT1HuntingKnife 5\n" +
                 "  affix spawn rare meleeToolPickT1IronPickaxe 6\n" +
+                "  affix spawn rare armorPrimitiveHelmet 6\n" +
                 "  affix spawn rare gunHandgunT1Pistol 6 true\n" +
                 "  affix inspect\n" +
                 "  affix currency 3\n" +
@@ -127,6 +128,7 @@ namespace AffixSystem.Commands
                 "  affix list held\n" +
                 "  affix validate meleeWpnBladeT1HuntingKnife 5\n" +
                 "  affix validate meleeToolPickT1IronPickaxe 6\n" +
+                "  affix validate armorPrimitiveHelmet 6\n" +
                 "  affix debug loot on";
         }
 
@@ -312,7 +314,7 @@ namespace AffixSystem.Commands
             Output("Validating: " + itemName + " Q" + itemValue.Quality);
             if (!AffixEligibility.IsSupportedBaseItem(itemValue))
             {
-                Output("Unsupported affix base. Current scope supports quality weapons and tools.");
+                Output("Unsupported affix base. Current scope supports quality weapons, tools, and armor.");
                 return;
             }
 

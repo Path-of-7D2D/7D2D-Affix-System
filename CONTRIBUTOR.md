@@ -47,5 +47,11 @@ Build properties match the other local Path-of-7D2D modlets:
   Affixes tab renders tool affixes and boosted tool stat numbers.
 - Run `affix currency 2`, hold the affixed tool, then use `Affix Augment` from
   inventory.
+- Run `affix validate armorPrimitiveHelmet 6` and `affix validate armorMinerOutfit 6`
+  and confirm only slot-legal armor affixes appear.
+- Run `affix spawn rare armorPrimitiveHelmet 6`, inspect it, and confirm the
+  Affixes tab renders armor affixes and boosted armor stat numbers.
+- Run `affix currency 2`, hold the affixed armor item, then use `Affix Augment`
+  from inventory.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
-  supported generated weapons and tools roll Magic or Rare affixes.
+  supported generated weapons, tools, and armor roll Magic or Rare affixes.

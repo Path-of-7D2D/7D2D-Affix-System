@@ -11,6 +11,11 @@ namespace AffixSystem.Affixes
         private const string AnyTool = "tool";
         private const string HarvestTool = "harvestingSkill,miningTool,salvageTool";
         private const string MotorTool = "motorTool";
+        private const string AnyArmor = "armor";
+        private const string ArmorHead = "armorHead";
+        private const string ArmorChest = "armorChest";
+        private const string ArmorHands = "armorHands";
+        private const string ArmorFeet = "armorFeet";
 
         private static readonly AffixDefinition[] definitions =
         {
@@ -31,7 +36,16 @@ namespace AffixSystem.Affixes
             new AffixDefinition("bountiful", "Bountiful", PassiveEffects.HarvestCount, "resource harvest", Values(10, 20, 30, 40, 50, 60), HarvestTool),
             new AffixDefinition("braced", "Braced", PassiveEffects.DegradationMax, "durability", Values(20, 40, 60, 80, 100, 120), AnyTool),
             new AffixDefinition("workhorse", "Workhorse", PassiveEffects.BlockDamage, "motor tool block damage", Values(8, 16, 24, 32, 40, 48), MotorTool),
-            new AffixDefinition("gravebreaker", "Gravebreaker", PassiveEffects.EntityDamage, "entity damage", Values(4, 8, 12, 16, 20, 24), AnyTool)
+            new AffixDefinition("gravebreaker", "Gravebreaker", PassiveEffects.EntityDamage, "entity damage", Values(4, 8, 12, 16, 20, 24), AnyTool),
+            new AffixDefinition("vital", "Vital", PassiveEffects.HealthMax, "max health", Values(4, 8, 12, 16, 20, 24), ArmorChest),
+            new AffixDefinition("enduring", "Enduring", PassiveEffects.StaminaMax, "max stamina", Values(4, 8, 12, 16, 20, 24), ArmorChest, ArmorFeet),
+            new AffixDefinition("quickstep", "Quickstep", PassiveEffects.Mobility, "mobility", Values(2, 4, 6, 8, 10, 12), ArmorFeet),
+            new AffixDefinition("silent", "Silent", PassiveEffects.NoiseMultiplier, "noise", Values(-4, -8, -12, -16, -20, -24), ArmorFeet, ArmorHands),
+            new AffixDefinition("insulated", "Insulated", PassiveEffects.ElementalDamageResist, "elemental resist", Values(4, 8, 12, 16, 20, 24), ArmorHead, ArmorChest),
+            new AffixDefinition("hardy", "Hardy", PassiveEffects.BuffResistance, "injury resist", Values(4, 8, 12, 16, 20, 24), AnyArmor),
+            new AffixDefinition("packrat", "Packrat", PassiveEffects.CarryCapacity, "carry capacity", Values(4, 8, 12, 16, 20, 24), ArmorChest),
+            new AffixDefinition("specialist", "Specialist", PassiveEffects.DamageModifier, "global damage", Values(2, 4, 6, 8, 10, 12), ArmorHands),
+            new AffixDefinition("wastelandHardened", "Wasteland-Hardened", PassiveEffects.GeneralDamageResist, "damage resist", Values(2, 4, 6, 8, 10, 12), AnyArmor)
         };
 
         private static readonly Dictionary<string, AffixDefinition> byId = BuildById();
