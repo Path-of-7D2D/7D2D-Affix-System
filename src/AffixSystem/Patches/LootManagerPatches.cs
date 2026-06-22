@@ -45,14 +45,27 @@ namespace AffixSystem.Patches
                 _bag.IsEmpty();
         }
 
-        private static void Postfix(LootManager __instance, Bag _bag, bool __state)
+        private static void Postfix(LootManager __instance, Bag _bag, Entity _bagOwner, bool __state)
         {
             if (!__state || _bag == null)
             {
                 return;
             }
 
-            AffixLootService.ApplyToGeneratedLoot(_bag.GetSlots(), __instance.Random, "loot-bag");
+            AffixLootService.ApplyToGeneratedLoot(_bag.GetSlots(), __instance.Random, BuildLootBagSource(_bagOwner));
+        }
+
+        private static string BuildLootBagSource(Entity bagOwner)
+        {
+            if (bagOwner == null)
+            {
+                return "loot-bag";
+            }
+
+            string ownerName = bagOwner.name;
+            return string.IsNullOrEmpty(ownerName)
+                ? "loot-bag"
+                : "loot-bag:" + ownerName;
         }
     }
 }

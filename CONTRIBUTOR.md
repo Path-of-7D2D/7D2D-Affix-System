@@ -71,6 +71,9 @@ Build properties match the other local Path-of-7D2D modlets:
   reports the same metadata, origin, and affix count.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
   supported generated weapons, tools, and armor roll Magic or Rare affixes.
+- Open a fresh zombie loot bag with loot debug enabled and confirm the logged
+  source starts with `loot-bag`, ideally including the owner name when the game
+  provides one.
 - Run `affix debug rarity container:hardenedChestT5` and confirm it reports a
   high-risk source with increased Rare weight.
 - Run `affix debug rarity container:groupSmallWeaponBag` and confirm it reports
