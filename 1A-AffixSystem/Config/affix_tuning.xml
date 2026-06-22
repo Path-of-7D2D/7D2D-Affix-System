@@ -6,7 +6,14 @@
     <rarityWeights>
       <magic>75</magic>
       <rare>25</rare>
+      <highRiskRareBonus>10</highRiskRareBonus>
     </rarityWeights>
+    <highRiskSources>
+      <source>reinforcedChestT3</source>
+      <source>hardenedChest</source>
+      <source>infestedT4</source>
+      <source>infestedT5</source>
+    </highRiskSources>
     <affixCounts>
       <magic>2</magic>
       <rare>4</rare>

@@ -70,6 +70,7 @@ affix augment
 affix list [all|held]
 affix validate [itemName] [quality=6]
 affix debug loot <on|off>
+affix debug rarity [source]
 affix reload
 ```
 
@@ -100,6 +101,7 @@ affix validate meleeToolPickT3Auger 6
 affix validate armorPrimitiveHelmet 6
 affix validate armorMinerOutfit 6
 affix debug loot on
+affix debug rarity container:hardenedChestT5
 ```
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
@@ -125,13 +127,18 @@ Config/affix_tuning.xml
 ```
 
 The file controls generated-loot rolling, loot debug logging, Magic/Rare rarity
-weights, quality-based natural affix count ranges, augment caps, and the augment
-currency item name.
+weights, high-risk loot source rarity bias, quality-based natural affix count
+ranges, augment caps, and the augment currency item name.
 After editing the file in a running world, use:
 
 ```text
 affix reload
 ```
+
+Default generated loot uses 75/25 Magic/Rare weights. Sources matching the
+configured high-risk patterns, such as hardened or high-tier infested loot, move
+10 weight points from Magic to Rare by default. Use `affix debug rarity
+container:hardenedChestT5` to inspect the effective weights for a source string.
 
 Currency acquisition is patched through:
 

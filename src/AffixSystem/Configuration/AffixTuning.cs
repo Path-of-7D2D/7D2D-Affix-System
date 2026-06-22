@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -21,6 +22,8 @@ namespace AffixSystem.Config
 
         public static int RareLootWeight { get; private set; } = 25;
 
+        public static int HighRiskRareBonus { get; private set; } = 10;
+
         public static int MagicNaturalAffixCount { get; private set; } = 2;
 
         public static int RareNaturalAffixCount { get; private set; } = 4;
@@ -33,6 +36,7 @@ namespace AffixSystem.Config
 
         private static IntRange[] magicNaturalAffixCountsByQuality = BuildDefaultMagicCountRanges();
         private static IntRange[] rareNaturalAffixCountsByQuality = BuildDefaultRareCountRanges();
+        private static string[] highRiskSourcePatterns = BuildDefaultHighRiskSourcePatterns();
 
         public static void Load(Mod modInstance)
         {
@@ -61,11 +65,13 @@ namespace AffixSystem.Config
                 LootDebugLogging = ReadBool(root, "loot/debugLogging", LootDebugLogging);
                 MagicLootWeight = ReadInt(root, "loot/rarityWeights/magic", MagicLootWeight, 0, 100000);
                 RareLootWeight = ReadInt(root, "loot/rarityWeights/rare", RareLootWeight, 0, 100000);
+                HighRiskRareBonus = ReadInt(root, "loot/rarityWeights/highRiskRareBonus", HighRiskRareBonus, 0, 100000);
                 MagicNaturalAffixCount = ReadInt(root, "loot/affixCounts/magic", MagicNaturalAffixCount, 1, 6);
                 RareNaturalAffixCount = ReadInt(root, "loot/affixCounts/rare", RareNaturalAffixCount, 1, 6);
                 MagicAffixCap = ReadInt(root, "affixCaps/magic", MagicAffixCap, 1, 6);
                 RareAffixCap = ReadInt(root, "affixCaps/rare", RareAffixCap, 1, 6);
                 AugmentItemName = ReadString(root, "currency/augmentItemName", AugmentItemName);
+                ReadHighRiskSourcePatterns(root);
 
                 if (!ReadQualityCountRanges(root))
                 {
@@ -93,8 +99,15 @@ namespace AffixSystem.Config
 
         public static AffixRarity ChooseLootRarity(Random random)
         {
+            return ChooseLootRarity(random, null);
+        }
+
+        public static AffixRarity ChooseLootRarity(Random random, string source)
+        {
             int magicWeight = Math.Max(0, MagicLootWeight);
             int rareWeight = Math.Max(0, RareLootWeight);
+            ApplyHighRiskRarityBias(source, ref magicWeight, ref rareWeight);
+
             int total = magicWeight + rareWeight;
             if (total <= 0)
             {
@@ -103,6 +116,48 @@ namespace AffixSystem.Config
 
             int roll = random.Next(total);
             return roll < rareWeight ? AffixRarity.Rare : AffixRarity.Magic;
+        }
+
+        public static string GetLootRarityWeightSummary(string source)
+        {
+            int magicWeight = Math.Max(0, MagicLootWeight);
+            int rareWeight = Math.Max(0, RareLootWeight);
+            bool highRisk = IsHighRiskLootSource(source);
+            ApplyHighRiskRarityBias(source, ref magicWeight, ref rareWeight);
+
+            return "Magic " + magicWeight.ToString(CultureInfo.InvariantCulture) +
+                ", Rare " + rareWeight.ToString(CultureInfo.InvariantCulture) +
+                (highRisk ? " (high-risk source)" : " (standard source)");
+        }
+
+        public static string GetHighRiskSourcePatternSummary()
+        {
+            if (highRiskSourcePatterns == null || highRiskSourcePatterns.Length == 0)
+            {
+                return "none";
+            }
+
+            return string.Join(", ", highRiskSourcePatterns);
+        }
+
+        public static bool IsHighRiskLootSource(string source)
+        {
+            if (string.IsNullOrEmpty(source) || highRiskSourcePatterns == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < highRiskSourcePatterns.Length; i++)
+            {
+                string pattern = highRiskSourcePatterns[i];
+                if (!string.IsNullOrEmpty(pattern) &&
+                    source.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static int GetAffixCap(AffixRarity rarity)
@@ -151,6 +206,7 @@ namespace AffixSystem.Config
             LootDebugLogging = false;
             MagicLootWeight = 75;
             RareLootWeight = 25;
+            HighRiskRareBonus = 10;
             MagicNaturalAffixCount = 2;
             RareNaturalAffixCount = 4;
             MagicAffixCap = 3;
@@ -158,6 +214,7 @@ namespace AffixSystem.Config
             AugmentItemName = DefaultAugmentItemName;
             magicNaturalAffixCountsByQuality = BuildDefaultMagicCountRanges();
             rareNaturalAffixCountsByQuality = BuildDefaultRareCountRanges();
+            highRiskSourcePatterns = BuildDefaultHighRiskSourcePatterns();
         }
 
         private static string ResolveConfigPath(Mod modInstance)
@@ -231,6 +288,30 @@ namespace AffixSystem.Config
             }
 
             return node.InnerText.Trim();
+        }
+
+        private static void ReadHighRiskSourcePatterns(XmlNode root)
+        {
+            XmlNodeList nodes = root.SelectNodes("loot/highRiskSources/source");
+            if (nodes == null || nodes.Count == 0)
+            {
+                return;
+            }
+
+            var patterns = new List<string>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                string pattern = nodes[i]?.InnerText?.Trim();
+                if (!string.IsNullOrEmpty(pattern))
+                {
+                    patterns.Add(pattern);
+                }
+            }
+
+            if (patterns.Count > 0)
+            {
+                highRiskSourcePatterns = patterns.ToArray();
+            }
         }
 
         private static bool ReadQualityCountRanges(XmlNode root)
@@ -334,6 +415,29 @@ namespace AffixSystem.Config
             ranges[5] = new IntRange(3, 5);
             ranges[6] = new IntRange(3, 6);
             return ranges;
+        }
+
+        private static string[] BuildDefaultHighRiskSourcePatterns()
+        {
+            return new[]
+            {
+                "reinforcedChestT3",
+                "hardenedChest",
+                "infestedT4",
+                "infestedT5"
+            };
+        }
+
+        private static void ApplyHighRiskRarityBias(string source, ref int magicWeight, ref int rareWeight)
+        {
+            if (!IsHighRiskLootSource(source))
+            {
+                return;
+            }
+
+            int bonus = Math.Min(magicWeight, Math.Max(0, HighRiskRareBonus));
+            magicWeight -= bonus;
+            rareWeight += bonus;
         }
 
         private static int ClampQuality(int quality)

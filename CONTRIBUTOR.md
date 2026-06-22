@@ -60,6 +60,10 @@ Build properties match the other local Path-of-7D2D modlets:
   does not contain two affixes from the same family.
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
   supported generated weapons, tools, and armor roll Magic or Rare affixes.
+- Run `affix debug rarity container:hardenedChestT5` and confirm it reports a
+  high-risk source with increased Rare weight.
+- Run `affix debug rarity container:groupSmallWeaponBag` and confirm it reports
+  the standard Magic/Rare weights.
 - Open high-value loot such as weapon bags, toolboxes, armor racks,
   reinforced/hardened chests, infestation rewards, or zombie loot bags and
   confirm `Affix Augment` can appear without being sold as normal trader stock.

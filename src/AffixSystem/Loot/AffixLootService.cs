@@ -43,7 +43,7 @@ namespace AffixSystem.Loot
                     continue;
                 }
 
-                AffixRarity rarity = AffixTuning.ChooseLootRarity(random);
+                AffixRarity rarity = AffixTuning.ChooseLootRarity(random, source);
                 int affixCount = AffixTuning.GetNaturalAffixCount(rarity, (int)itemValue.Quality, random);
                 AffixItemState state = AffixRoller.Roll(itemValue, rarity, random, affixCount);
                 if (state.Affixes.Count == 0)
@@ -54,7 +54,7 @@ namespace AffixSystem.Loot
 
                 state.WriteTo(itemValue);
                 rolled++;
-                AffixTuning.LogLoot(source + "[" + i + "]: rolled " + rarity + " " + GetItemName(itemValue) + " Q" + itemValue.Quality + ".");
+                AffixTuning.LogLoot(source + "[" + i + "]: rolled " + rarity + " " + GetItemName(itemValue) + " Q" + itemValue.Quality + "; " + AffixTuning.GetLootRarityWeightSummary(source) + ".");
             }
 
             if (rolled > 0)
