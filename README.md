@@ -125,6 +125,11 @@ affix debug loot on
 affix debug rarity container:hardenedChestT5 6
 ```
 
+With loot debug enabled, opening a container also logs the backing loot slot
+count versus the container's declared XML size. If the current experimental
+build creates an undersized backing array, the mod expands it before generated
+loot rolls so the loot window can show the full declared container grid.
+
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
 
 `Affix Augment` can be used from inventory while the target Magic or Rare item
