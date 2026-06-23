@@ -44,7 +44,7 @@ namespace AffixSystem.Patches
                 tileEntity.IsEmpty();
         }
 
-        private static string BuildContainerSource(ITileEntityLootable tileEntity)
+        internal static string BuildContainerSource(ITileEntityLootable tileEntity)
         {
             if (tileEntity == null || string.IsNullOrEmpty(tileEntity.lootListName))
             {
@@ -54,7 +54,7 @@ namespace AffixSystem.Patches
             return "container:" + tileEntity.lootListName;
         }
 
-        private static void EnsureDeclaredContainerCapacity(ITileEntityLootable tileEntity, string source)
+        internal static void EnsureDeclaredContainerCapacity(ITileEntityLootable tileEntity, string source)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace AffixSystem.Patches
                     return;
                 }
 
-                Vector2i containerSize = tileEntity.GetContainerSize();
+                Vector2i containerSize = ResolveContainerSize(tileEntity, source);
                 int targetSlotCount = containerSize.x * containerSize.y;
                 if (containerSize.x <= 0 || containerSize.y <= 0 || targetSlotCount <= 0)
                 {
@@ -77,7 +77,7 @@ namespace AffixSystem.Patches
                 if (currentSlotCount >= targetSlotCount)
                 {
                     AffixTuning.LogLoot(source + ": loot slots " + currentSlotCount + "/" + targetSlotCount +
-                        " already match declared " + containerSize.x + "x" + containerSize.y +
+                        " already match resolved " + containerSize.x + "x" + containerSize.y +
                         "; non-empty " + nonEmptySlotCount + ".");
                     return;
                 }
@@ -97,13 +97,48 @@ namespace AffixSystem.Patches
 
                 tileEntity.items = expandedSlots;
                 AffixTuning.LogLoot(source + ": expanded loot slots " + currentSlotCount + " -> " + expandedSlots.Length +
-                    " from declared " + containerSize.x + "x" + containerSize.y +
+                    " from resolved " + containerSize.x + "x" + containerSize.y +
                     "; preserved non-empty " + nonEmptySlotCount + ".");
             }
             catch (Exception ex)
             {
                 AffixTuning.LogLoot(source + ": failed loot slot capacity check. " + ex.GetType().Name + ": " + ex.Message);
             }
+        }
+
+        private static Vector2i ResolveContainerSize(ITileEntityLootable tileEntity, string source)
+        {
+            Vector2i declaredSize = tileEntity.GetContainerSize();
+            Vector2i lootDefinitionSize = GetLootDefinitionSize(tileEntity.lootListName);
+            int declaredSlots = GetSlotCount(declaredSize);
+            int definitionSlots = GetSlotCount(lootDefinitionSize);
+
+            if (definitionSlots > declaredSlots)
+            {
+                tileEntity.SetContainerSize(lootDefinitionSize, false);
+                AffixTuning.LogLoot(source + ": corrected declared loot size " +
+                    declaredSize.x + "x" + declaredSize.y + " -> " +
+                    lootDefinitionSize.x + "x" + lootDefinitionSize.y + " from loot.xml.");
+                return lootDefinitionSize;
+            }
+
+            return declaredSize;
+        }
+
+        private static Vector2i GetLootDefinitionSize(string lootListName)
+        {
+            if (string.IsNullOrEmpty(lootListName))
+            {
+                return Vector2i.zero;
+            }
+
+            LootContainer lootContainer = LootContainer.GetLootContainer(lootListName, false);
+            return lootContainer == null ? Vector2i.zero : lootContainer.size;
+        }
+
+        private static int GetSlotCount(Vector2i size)
+        {
+            return size.x <= 0 || size.y <= 0 ? 0 : size.x * size.y;
         }
 
         private static int CountNonEmptySlots(ItemStack[] slots)
@@ -124,6 +159,17 @@ namespace AffixSystem.Patches
             }
 
             return count;
+        }
+    }
+
+    [HarmonyPatch(typeof(XUiC_LootWindow), "SetTileEntityChest")]
+    internal static class XUiCLootWindowSetTileEntityChestPatch
+    {
+        private static void Prefix(ITileEntityLootable _te)
+        {
+            LootManagerLootContainerOpenedPatch.EnsureDeclaredContainerCapacity(
+                _te,
+                LootManagerLootContainerOpenedPatch.BuildContainerSource(_te));
         }
     }
 

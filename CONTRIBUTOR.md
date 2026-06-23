@@ -72,7 +72,8 @@ Build properties match the other local Path-of-7D2D modlets:
 - Run `affix debug loot on`, open a never-opened loot container, and confirm
   supported generated weapons, tools, and armor roll Magic or Rare affixes.
 - With loot debug enabled, confirm the same container logs its backing slot
-  count against its declared size and expands undersized non-player loot arrays.
+  count against its resolved `loot.xml` size and expands undersized non-player
+  loot arrays before the loot window renders.
 - Open a fresh zombie loot bag with loot debug enabled and confirm the logged
   source starts with `loot-bag`, ideally including the owner name when the game
   provides one.

@@ -126,9 +126,9 @@ affix debug rarity container:hardenedChestT5 6
 ```
 
 With loot debug enabled, opening a container also logs the backing loot slot
-count versus the container's declared XML size. If the current experimental
-build creates an undersized backing array, the mod expands it before generated
-loot rolls so the loot window can show the full declared container grid.
+count versus the resolved `loot.xml` size. If the current experimental build
+creates a `1x1` tile-entity size for a larger loot container, the mod corrects
+the size before the loot window renders and before generated loot rolls.
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
 
