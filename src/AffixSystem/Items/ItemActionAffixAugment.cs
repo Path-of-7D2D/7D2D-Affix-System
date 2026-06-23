@@ -96,3 +96,7 @@ public class ItemActionAffixAugment : ItemAction
         Log.Out("[AffixSystem] " + message);
     }
 }
+
+public class AffixAugment : ItemActionAffixAugment
+{
+}

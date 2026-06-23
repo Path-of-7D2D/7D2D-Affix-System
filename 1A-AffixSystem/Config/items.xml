@@ -10,7 +10,7 @@
       <property name="Group" value="Resources"/>
       <property name="CreativeMode" value="Player"/>
       <property class="Action0">
-        <property name="Class" value="AffixAugment"/>
+        <property name="Class" value="AffixAugment, AffixSystem"/>
         <property name="Delay" value="0"/>
         <property name="Description" value="lblAffixAugmentUse"/>
       </property>
