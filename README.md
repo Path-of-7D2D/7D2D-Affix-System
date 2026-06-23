@@ -128,7 +128,9 @@ affix debug rarity container:hardenedChestT5 6
 With loot debug enabled, opening a container also logs the backing loot slot
 count versus the resolved `loot.xml` size. If the current experimental build
 creates a `1x1` tile-entity size for a larger loot container, the mod corrects
-the size before the loot window renders and before generated loot rolls.
+the size before the loot window renders and before generated loot rolls. This
+size repair also applies to player storage, but player storage is still excluded
+from generated affix rolls.
 
 `drop=false` adds the item to the backpack. `drop=true` drops it at the player.
 

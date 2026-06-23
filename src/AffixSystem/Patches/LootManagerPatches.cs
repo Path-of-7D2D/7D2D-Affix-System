@@ -58,7 +58,7 @@ namespace AffixSystem.Patches
         {
             try
             {
-                if (tileEntity == null || tileEntity.bPlayerStorage)
+                if (tileEntity == null)
                 {
                     return;
                 }
